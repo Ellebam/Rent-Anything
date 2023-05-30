@@ -1,0 +1,43 @@
+# Ignore Maven and Gradle build directories
+target/
+build/
+
+# Ignore Spring Boot's specific files
+*.pid
+*.war
+*.ear
+*.db
+
+# Ignore .git directory
+.git/
+
+# Ignore IDE specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+
+# Ignore log files
+*.log
+
+# Ignore the Dockerfile
+Dockerfile
+
+# Ignore the docker-compose file if exists
+docker-compose.yml
+
+# Ignore the .gitignore file
+.gitignore
+
+# Ignore the .dockerignore file
+.dockerignore
+
+# Ignore other files that might be in your project's root directory
+*.md
+*.txt
+*.yml
+*.sh
+*.bat
