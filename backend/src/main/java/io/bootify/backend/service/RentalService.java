@@ -3,6 +3,8 @@ package io.bootify.backend.service;
 import io.bootify.backend.domain.Rental;
 import io.bootify.backend.model.RentalDTO;
 import io.bootify.backend.repos.RentalRepository;
+import io.bootify.backend.repos.UserRepository;
+import io.bootify.backend.repos.OfferRepository;
 import io.bootify.backend.util.NotFoundException;
 import java.util.List;
 import org.springframework.data.domain.Sort;
@@ -13,9 +15,13 @@ import org.springframework.stereotype.Service;
 public class RentalService {
 
     private final RentalRepository rentalRepository;
+    private final UserRepository userRepository;
+    private final OfferRepository offerRepository;
 
-    public RentalService(final RentalRepository rentalRepository) {
+    public RentalService(final RentalRepository rentalRepository, final UserRepository userRepository, final OfferRepository offerRepository) {
         this.rentalRepository = rentalRepository;
+        this.userRepository = userRepository;
+        this.offerRepository = offerRepository;
     }
 
     public List<RentalDTO> findAll() {
@@ -50,19 +56,20 @@ public class RentalService {
 
     private RentalDTO mapToDTO(final Rental rental, final RentalDTO rentalDTO) {
         rentalDTO.setId(rental.getId());
-        rentalDTO.setUserId(rental.getUserId());
-        rentalDTO.setOfferId(rental.getOfferId());
+        rentalDTO.setRenterId(rental.getRenter().getId()); // fetch Id from User object
+        rentalDTO.setOfferId(rental.getOffer().getId()); // fetch Id from Offer object
         rentalDTO.setStartDate(rental.getStartDate());
         rentalDTO.setEndDate(rental.getEndDate());
         return rentalDTO;
     }
 
     private Rental mapToEntity(final RentalDTO rentalDTO, final Rental rental) {
-        rental.setUserId(rentalDTO.getUserId());
-        rental.setOfferId(rentalDTO.getOfferId());
+        rental.setRenter(userRepository.findById(rentalDTO.getRenterId()).orElseThrow(NotFoundException::new)); // fetch User by Id
+        rental.setOffer(offerRepository.findById(rentalDTO.getOfferId()).orElseThrow(NotFoundException::new)); // fetch Offer by Id
         rental.setStartDate(rentalDTO.getStartDate());
         rental.setEndDate(rentalDTO.getEndDate());
         return rental;
     }
 
 }
+

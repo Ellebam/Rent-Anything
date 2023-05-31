@@ -56,30 +56,27 @@ public class RentalApplicationService {
     public void delete(final Long id) {
         rentalApplicationRepository.deleteById(id);
     }
-
     private RentalApplicationDTO mapToDTO(final RentalApplication rentalApplication,
             final RentalApplicationDTO rentalApplicationDTO) {
         rentalApplicationDTO.setId(rentalApplication.getId());
-        rentalApplicationDTO.setUserId(rentalApplication.getUserId());
-        rentalApplicationDTO.setOfferId(rentalApplication.getOfferId());
-        rentalApplicationDTO.setIsApproved(rentalApplication.getIsApproved());
-        rentalApplicationDTO.setUser(rentalApplication.getUser() == null ? null : rentalApplication.getUser().getId());
-        rentalApplicationDTO.setOffer(rentalApplication.getOffer() == null ? null : rentalApplication.getOffer().getId());
+        rentalApplicationDTO.setApplicantId(rentalApplication.getApplicant().getId());
+        rentalApplicationDTO.setOfferId(rentalApplication.getOffer().getId());
+        rentalApplicationDTO.setApproved(rentalApplication.isApproved());
         return rentalApplicationDTO;
     }
 
     private RentalApplication mapToEntity(final RentalApplicationDTO rentalApplicationDTO,
             final RentalApplication rentalApplication) {
-        rentalApplication.setUserId(rentalApplicationDTO.getUserId());
-        rentalApplication.setOfferId(rentalApplicationDTO.getOfferId());
-        rentalApplication.setIsApproved(rentalApplicationDTO.getIsApproved());
-        final User user = rentalApplicationDTO.getUser() == null ? null : userRepository.findById(rentalApplicationDTO.getUser())
-                .orElseThrow(() -> new NotFoundException("user not found"));
-        rentalApplication.setUser(user);
-        final Offer offer = rentalApplicationDTO.getOffer() == null ? null : offerRepository.findById(rentalApplicationDTO.getOffer())
-                .orElseThrow(() -> new NotFoundException("offer not found"));
+        rentalApplication.setApproved(rentalApplicationDTO.isApproved());
+        
+        final User user = userRepository.findById(rentalApplicationDTO.getApplicantId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        rentalApplication.setApplicant(user);
+        
+        final Offer offer = offerRepository.findById(rentalApplicationDTO.getOfferId())
+                .orElseThrow(() -> new NotFoundException("Offer not found"));
         rentalApplication.setOffer(offer);
+        
         return rentalApplication;
     }
-
 }

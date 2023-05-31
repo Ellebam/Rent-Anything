@@ -67,11 +67,11 @@ public class RentalApplication {
         this.offer = offer;
     }
 
-    public Boolean getIsApproved() {
+    public Boolean isApproved() {
         return isApproved;
     }
 
-    public void setIsApproved(final Boolean isApproved) {
+    public void setApproved(final Boolean isApproved) {
         this.isApproved = isApproved;
     }
 

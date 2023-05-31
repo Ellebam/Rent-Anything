@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -34,10 +33,10 @@ public class Rental {
     private Offer offer;
 
     @Column(nullable = false)
-    private LocalDate startDate;
+    private OffsetDateTime startDate;
 
     @Column
-    private LocalDate endDate;
+    private OffsetDateTime endDate;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -71,19 +70,19 @@ public class Rental {
         this.offer = offer;
     }
 
-    public LocalDate getStartDate() {
+    public OffsetDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(final LocalDate startDate) {
+    public void setStartDate(final OffsetDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public OffsetDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(final LocalDate endDate) {
+    public void setEndDate(final OffsetDateTime endDate) {
         this.endDate = endDate;
     }
 

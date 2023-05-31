@@ -7,7 +7,7 @@ public class RentalApplicationDTO {
     private Long id;
 
     @NotNull
-    private Long userId;
+    private Long applicantId;
 
     @NotNull
     private Long offerId;
@@ -23,12 +23,12 @@ public class RentalApplicationDTO {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getApplicantId() {
+        return applicantId;
     }
 
-    public void setUserId(final Long userId) {
-        this.userId = userId;
+    public void setApplicantId(final Long applicantId) {
+        this.applicantId = applicantId;
     }
 
     public Long getOfferId() {
@@ -39,11 +39,11 @@ public class RentalApplicationDTO {
         this.offerId = offerId;
     }
 
-    public Boolean getIsApproved() {
+    public Boolean isApproved() {
         return isApproved;
     }
 
-    public void setIsApproved(final Boolean isApproved) {
+    public void setApproved(final Boolean isApproved) {
         this.isApproved = isApproved;
     }
 

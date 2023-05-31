@@ -8,7 +8,7 @@ public class RentalDTO {
     private Long id;
 
     @NotNull
-    private Long userId;
+    private Long renterId;
 
     @NotNull
     private Long offerId;
@@ -26,12 +26,12 @@ public class RentalDTO {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getRenterId() {
+        return renterId;
     }
 
-    public void setUserId(final Long userId) {
-        this.userId = userId;
+    public void setRenterId(final Long renterId) {
+        this.renterId = renterId;
     }
 
     public Long getOfferId() {
