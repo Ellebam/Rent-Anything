@@ -1,8 +1,7 @@
 package io.bootify.backend.model;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
-
+import java.time.OffsetDateTime;
 
 public class RentalDTO {
 
@@ -15,9 +14,9 @@ public class RentalDTO {
     private Long offerId;
 
     @NotNull
-    private LocalDate startDate;
+    private OffsetDateTime startDate;
 
-    private LocalDate endDate;
+    private OffsetDateTime endDate;
 
     public Long getId() {
         return id;
@@ -43,19 +42,19 @@ public class RentalDTO {
         this.offerId = offerId;
     }
 
-    public LocalDate getStartDate() {
+    public OffsetDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(final LocalDate startDate) {
+    public void setStartDate(final OffsetDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public OffsetDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(final LocalDate endDate) {
+    public void setEndDate(final OffsetDateTime endDate) {
         this.endDate = endDate;
     }
 

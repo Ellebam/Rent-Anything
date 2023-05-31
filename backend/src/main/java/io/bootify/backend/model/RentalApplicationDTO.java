@@ -1,8 +1,6 @@
 package io.bootify.backend.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-
 
 public class RentalApplicationDTO {
 
@@ -15,12 +13,7 @@ public class RentalApplicationDTO {
     private Long offerId;
 
     @NotNull
-    @JsonProperty("isApproved")
     private Boolean isApproved;
-
-    private Long user;
-
-    private Long offer;
 
     public Long getId() {
         return id;
@@ -52,22 +45,6 @@ public class RentalApplicationDTO {
 
     public void setIsApproved(final Boolean isApproved) {
         this.isApproved = isApproved;
-    }
-
-    public Long getUser() {
-        return user;
-    }
-
-    public void setUser(final Long user) {
-        this.user = user;
-    }
-
-    public Long getOffer() {
-        return offer;
-    }
-
-    public void setOffer(final Long offer) {
-        this.offer = offer;
     }
 
 }

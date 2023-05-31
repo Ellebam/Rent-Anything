@@ -60,8 +60,7 @@ public class OfferService {
         offerDTO.setLocation(offer.getLocation());
         offerDTO.setPrice(offer.getPrice());
         offerDTO.setImageUrl(offer.getImageUrl());
-        offerDTO.setUserId(offer.getUserId());
-        offerDTO.setUser(offer.getUser() == null ? null : offer.getUser().getId());
+        offerDTO.setUserId(offer.getUser() != null ? offer.getUser().getId() : null);
         return offerDTO;
     }
 
@@ -71,10 +70,13 @@ public class OfferService {
         offer.setLocation(offerDTO.getLocation());
         offer.setPrice(offerDTO.getPrice());
         offer.setImageUrl(offerDTO.getImageUrl());
-        offer.setUserId(offerDTO.getUserId());
-        final User user = offerDTO.getUser() == null ? null : userRepository.findById(offerDTO.getUser())
-                .orElseThrow(() -> new NotFoundException("user not found"));
-        offer.setUser(user);
+        if (offerDTO.getUserId() != null) {
+            final User user = userRepository.findById(offerDTO.getUserId())
+                .orElseThrow(() -> new NotFoundException("User not found"));
+            offer.setUser(user);
+        } else {
+            offer.setUser(null);
+        }
         return offer;
     }
 

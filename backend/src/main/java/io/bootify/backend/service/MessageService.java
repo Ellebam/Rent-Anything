@@ -2,11 +2,14 @@ package io.bootify.backend.service;
 
 import io.bootify.backend.domain.Message;
 import io.bootify.backend.domain.User;
+import io.bootify.backend.domain.Offer;
+import io.bootify.backend.repos.OfferRepository;
 import io.bootify.backend.model.MessageDTO;
 import io.bootify.backend.repos.MessageRepository;
 import io.bootify.backend.repos.UserRepository;
 import io.bootify.backend.util.NotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -16,66 +19,71 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final OfferRepository offerRepository;
 
-    public MessageService(final MessageRepository messageRepository,
-            final UserRepository userRepository) {
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository, OfferRepository offerRepository) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.offerRepository = offerRepository;
     }
 
     public List<MessageDTO> findAll() {
-        final List<Message> messages = messageRepository.findAll(Sort.by("id"));
+        List<Message> messages = messageRepository.findAll(Sort.by("id"));
         return messages.stream()
-                .map((message) -> mapToDTO(message, new MessageDTO()))
-                .toList();
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
-    public MessageDTO get(final Long id) {
-        return messageRepository.findById(id)
-                .map((message) -> mapToDTO(message, new MessageDTO()))
+    public MessageDTO get(Long id) {
+        Message message = messageRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
+        return mapToDTO(message);
     }
 
-    public Long create(final MessageDTO messageDTO) {
-        final Message message = new Message();
-        mapToEntity(messageDTO, message);
+    public Long create(MessageDTO messageDTO) {
+        Message message = mapToEntity(messageDTO);
         return messageRepository.save(message).getId();
     }
 
-    public void update(final Long id, final MessageDTO messageDTO) {
-        final Message message = messageRepository.findById(id)
+    public void update(Long id, MessageDTO messageDTO) {
+        Message message = messageRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
         mapToEntity(messageDTO, message);
         messageRepository.save(message);
     }
 
-    public void delete(final Long id) {
+    public void delete(Long id) {
         messageRepository.deleteById(id);
     }
 
-    private MessageDTO mapToDTO(final Message message, final MessageDTO messageDTO) {
+    private MessageDTO mapToDTO(Message message) {
+        MessageDTO messageDTO = new MessageDTO();
         messageDTO.setId(message.getId());
-        messageDTO.setUserId(message.getUserId());
-        messageDTO.setOfferId(message.getOfferId());
+        messageDTO.setSenderId(message.getSender() == null ? null : message.getSender().getId());
+        messageDTO.setRecipientId(message.getRecipient() == null ? null : message.getRecipient().getId());
+        messageDTO.setOfferId(message.getOffer() == null ? null : message.getOffer().getId());
         messageDTO.setContent(message.getContent());
         messageDTO.setTimestamp(message.getTimestamp());
-        messageDTO.setSender(message.getSender() == null ? null : message.getSender().getId());
-        messageDTO.setRecipient(message.getRecipient() == null ? null : message.getRecipient().getId());
         return messageDTO;
     }
 
-    private Message mapToEntity(final MessageDTO messageDTO, final Message message) {
-        message.setUserId(messageDTO.getUserId());
-        message.setOfferId(messageDTO.getOfferId());
-        message.setContent(messageDTO.getContent());
-        message.setTimestamp(messageDTO.getTimestamp());
-        final User sender = messageDTO.getSender() == null ? null : userRepository.findById(messageDTO.getSender())
-                .orElseThrow(() -> new NotFoundException("sender not found"));
-        message.setSender(sender);
-        final User recipient = messageDTO.getRecipient() == null ? null : userRepository.findById(messageDTO.getRecipient())
-                .orElseThrow(() -> new NotFoundException("recipient not found"));
-        message.setRecipient(recipient);
+    private Message mapToEntity(MessageDTO messageDTO) {
+        Message message = new Message();
+        mapToEntity(messageDTO, message);
         return message;
     }
 
+    private void mapToEntity(MessageDTO messageDTO, Message message) {
+        message.setContent(messageDTO.getContent());
+        message.setTimestamp(messageDTO.getTimestamp());
+        User sender = messageDTO.getSenderId() == null ? null : userRepository.findById(messageDTO.getSenderId())
+                .orElseThrow(() -> new NotFoundException("Sender not found"));
+        message.setSender(sender);
+        User recipient = messageDTO.getRecipientId() == null ? null : userRepository.findById(messageDTO.getRecipientId())
+                .orElseThrow(() -> new NotFoundException("Recipient not found"));
+        message.setRecipient(recipient);
+        Offer offer = messageDTO.getOfferId() == null ? null : offerRepository.findById(messageDTO.getOfferId())
+                .orElseThrow(() -> new NotFoundException("Offer not found"));
+        message.setOffer(offer);
+    }
 }

@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -25,17 +24,11 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userId;
-
-    @Column(nullable = false)
-    private Long offerId;
-
     @Column(nullable = false, columnDefinition = "longtext")
     private String content;
 
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private OffsetDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
@@ -44,6 +37,10 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipient_id")
     private User recipient;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "offer_id")
+    private Offer offer;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -57,39 +54,23 @@ public class Message {
         return id;
     }
 
-    public void setId(final Long id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(final Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getOfferId() {
-        return offerId;
-    }
-
-    public void setOfferId(final Long offerId) {
-        this.offerId = offerId;
     }
 
     public String getContent() {
         return content;
     }
 
-    public void setContent(final String content) {
+    public void setContent(String content) {
         this.content = content;
     }
 
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(final LocalDateTime timestamp) {
+    public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -97,7 +78,7 @@ public class Message {
         return sender;
     }
 
-    public void setSender(final User sender) {
+    public void setSender(User sender) {
         this.sender = sender;
     }
 
@@ -105,15 +86,23 @@ public class Message {
         return recipient;
     }
 
-    public void setRecipient(final User recipient) {
+    public void setRecipient(User recipient) {
         this.recipient = recipient;
+    }
+
+    public Offer getOffer() {
+        return offer;
+    }
+
+    public void setOffer(Offer offer) {
+        this.offer = offer;
     }
 
     public OffsetDateTime getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(final OffsetDateTime dateCreated) {
+    public void setDateCreated(OffsetDateTime dateCreated) {
         this.dateCreated = dateCreated;
     }
 
@@ -121,8 +110,7 @@ public class Message {
         return lastUpdated;
     }
 
-    public void setLastUpdated(final OffsetDateTime lastUpdated) {
+    public void setLastUpdated(OffsetDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
-
 }

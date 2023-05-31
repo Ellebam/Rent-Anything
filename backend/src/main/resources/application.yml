@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mariadb://cozy-rents-db:3306/your_database?useSSL=false
+    url: jdbc:mariadb://rent-anything-db:3306/rent_anything?useSSL=false
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     dbcp2:
@@ -10,6 +10,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+      naming:
+        physical-strategy: "org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy"
     open-in-view: false
     properties:
       hibernate:
@@ -20,3 +22,8 @@ spring:
           new_generator_mappings: true
 springdoc:
   pathsToMatch: /api/**
+
+logging:
+  level:
+    org:
+      hibernate: DEBUG

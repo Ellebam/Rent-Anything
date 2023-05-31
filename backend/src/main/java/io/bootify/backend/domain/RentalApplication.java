@@ -24,22 +24,16 @@ public class RentalApplication {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User applicant;
 
-    @Column(nullable = false)
-    private Long offerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "offer_id", nullable = false)
+    private Offer offer;
 
     @Column(nullable = false)
     private Boolean isApproved;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "offer_id")
-    private Offer offer;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -57,36 +51,12 @@ public class RentalApplication {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getApplicant() {
+        return applicant;
     }
 
-    public void setUserId(final Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getOfferId() {
-        return offerId;
-    }
-
-    public void setOfferId(final Long offerId) {
-        this.offerId = offerId;
-    }
-
-    public Boolean getIsApproved() {
-        return isApproved;
-    }
-
-    public void setIsApproved(final Boolean isApproved) {
-        this.isApproved = isApproved;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(final User user) {
-        this.user = user;
+    public void setApplicant(final User applicant) {
+        this.applicant = applicant;
     }
 
     public Offer getOffer() {
@@ -95,6 +65,14 @@ public class RentalApplication {
 
     public void setOffer(final Offer offer) {
         this.offer = offer;
+    }
+
+    public Boolean getIsApproved() {
+        return isApproved;
+    }
+
+    public void setIsApproved(final Boolean isApproved) {
+        this.isApproved = isApproved;
     }
 
     public OffsetDateTime getDateCreated() {

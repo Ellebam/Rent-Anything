@@ -9,13 +9,14 @@ services:
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
     ports:
       - 5000:5000
-    container_name: cozy-rents-backend
+    container_name: rent-anything-backend
     networks:
       - prod
-
+    depends_on:
+      db:
+        condition: service_healthy
   db:
     image: mariadb:10.6.4
     environment:
@@ -25,9 +26,22 @@ services:
       - MYSQL_PASSWORD=${DB_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
-    container_name: cozy-rents-db
+    container_name: rent-anything-db
     networks:
       - prod
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+
+  debug:
+    image: busybox
+    container_name: debug-container
+    tty: true
+    networks:
+      - prod
+
 
 networks:
   prod:

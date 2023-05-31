@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Set;
 import org.springframework.data.annotation.CreatedDate;
@@ -36,16 +38,13 @@ public class Offer {
     private String location;
 
     @Column
-    private String price;
+    private BigDecimal price;
 
     @Column
     private String imageUrl;
 
-    @Column
-    private Long userId;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "offer")
@@ -91,11 +90,11 @@ public class Offer {
         this.location = location;
     }
 
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(final String price) {
+    public void setPrice(final BigDecimal price) {
         this.price = price;
     }
 
@@ -105,14 +104,6 @@ public class Offer {
 
     public void setImageUrl(final String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(final Long userId) {
-        this.userId = userId;
     }
 
     public User getUser() {

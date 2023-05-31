@@ -2,7 +2,7 @@ package io.bootify.backend.model;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
+import java.math.BigDecimal;
 
 public class OfferDTO {
 
@@ -19,15 +19,16 @@ public class OfferDTO {
     @Size(max = 255)
     private String location;
 
-    @Size(max = 255)
-    private String price;
+    @NotNull
+    private BigDecimal price;
+
+    @NotNull
+    private Integer quantity;
 
     @Size(max = 255)
     private String imageUrl;
 
     private Long userId;
-
-    private Long user;
 
     public Long getId() {
         return id;
@@ -61,12 +62,20 @@ public class OfferDTO {
         this.location = location;
     }
 
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(final String price) {
+    public void setPrice(final BigDecimal price) {
         this.price = price;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(final Integer quantity) {
+        this.quantity = quantity;
     }
 
     public String getImageUrl() {
@@ -83,14 +92,6 @@ public class OfferDTO {
 
     public void setUserId(final Long userId) {
         this.userId = userId;
-    }
-
-    public Long getUser() {
-        return user;
-    }
-
-    public void setUser(final Long user) {
-        this.user = user;
     }
 
 }

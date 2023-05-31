@@ -1,15 +1,17 @@
 package io.bootify.backend.model;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-
+import java.time.OffsetDateTime;
 
 public class MessageDTO {
 
     private Long id;
 
     @NotNull
-    private Long userId;
+    private Long senderId;
+
+    @NotNull
+    private Long recipientId;
 
     @NotNull
     private Long offerId;
@@ -18,33 +20,37 @@ public class MessageDTO {
     private String content;
 
     @NotNull
-    private LocalDateTime timestamp;
-
-    private Long sender;
-
-    private Long recipient;
+    private OffsetDateTime timestamp;
 
     public Long getId() {
         return id;
     }
 
-    public void setId(final Long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getSenderId() {
+        return senderId;
     }
 
-    public void setUserId(final Long userId) {
-        this.userId = userId;
+    public void setSenderId(Long senderId) {
+        this.senderId = senderId;
+    }
+
+    public Long getRecipientId() {
+        return recipientId;
+    }
+
+    public void setRecipientId(Long recipientId) {
+        this.recipientId = recipientId;
     }
 
     public Long getOfferId() {
         return offerId;
     }
 
-    public void setOfferId(final Long offerId) {
+    public void setOfferId(Long offerId) {
         this.offerId = offerId;
     }
 
@@ -52,32 +58,15 @@ public class MessageDTO {
         return content;
     }
 
-    public void setContent(final String content) {
+    public void setContent(String content) {
         this.content = content;
     }
 
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(final LocalDateTime timestamp) {
+    public void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
     }
-
-    public Long getSender() {
-        return sender;
-    }
-
-    public void setSender(final Long sender) {
-        this.sender = sender;
-    }
-
-    public Long getRecipient() {
-        return recipient;
-    }
-
-    public void setRecipient(final Long recipient) {
-        this.recipient = recipient;
-    }
-
 }
