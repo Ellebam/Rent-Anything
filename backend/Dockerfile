@@ -16,8 +16,8 @@ RUN mvn dependency:go-offline -B
 # Copy the rest of the code.
 COPY src ./src
 
-# Build the application.
-RUN mvn package -DskipTests
+# Build the application, and run tests
+RUN mvn test && mvn package
 
 # Use the Eclipse Temurin Java 17 JRE image for the runtime base image.
 FROM eclipse-temurin:17.0.7_7-jre

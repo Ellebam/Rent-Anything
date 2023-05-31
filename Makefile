@@ -13,7 +13,7 @@ backend-build:
 	cd $(BACKEND_DIR) && ./mvnw clean package  
 
 backend-image:  
-	cd $(BACKEND_DIR) && docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .  
+	cd $(BACKEND_DIR) && docker build --no-cache -t  $(IMAGE_NAME):$(IMAGE_TAG) .  
 
 backend-run:  
 	docker run -p $(BACKEND_PORT):$(BACKEND_PORT) $(IMAGE_NAME):$(IMAGE_TAG)  
@@ -42,4 +42,5 @@ compose-down:
 compose-build:
 	docker-compose build
 
+compose-rebuild: compose-down compose-build compose-up
 

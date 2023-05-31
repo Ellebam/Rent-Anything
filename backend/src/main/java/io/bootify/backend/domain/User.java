@@ -44,7 +44,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Offer> offers;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "applicant")
     private Set<RentalApplication> rentalApplications;
 
     @OneToMany(mappedBy = "sender")

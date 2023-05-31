@@ -10,7 +10,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
     ports:
-      - 5000:5000
+      - 5000:8080
     container_name: rent-anything-backend
     networks:
       - prod

@@ -8,6 +8,7 @@ application-local.yml
 node_modules/
 node/
 .env
+.DS_Store
 
 ### STS ###
 .apt_generated
