@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,28 +27,47 @@ class UserServiceTest {
     @Test
     void shouldCreateUser() {
         // Given
+        // Setup test data
         User user = new User();
         user.setUsername("test");
         user.setPassword("password");
         user.setEmail("test@email.com");
         user.setFirstName("Test");
         user.setLastName("User");
-        user.setCanPostOffer(true); // you can adjust this according to your test
-
+        user.setCanPostOffer(true); 
+    
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername("test");
         userDTO.setPassword("password");
         userDTO.setEmail("test@email.com");
         userDTO.setFirstName("Test");
         userDTO.setLastName("User");
-        userDTO.setCanPostOffer(true); // you can adjust this according to your test
-
-        given(userRepository.save(user)).willReturn(user);
-
+        userDTO.setCanPostOffer(true); 
+    
+        // Mock the behavior of userRepository.save() method to return our user
+        given(userRepository.save(any(User.class))).willReturn(user);
+    
         // When
+        // Call the method we are testing
         Long createdUserId = userService.create(userDTO);
-
+    
         // Then
+        // Capture the argument passed to userRepository.save() method
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userArgumentCaptor.capture());
+    
+        // Retrieve the argument (User object) that was passed to userRepository.save()
+        User capturedUser = userArgumentCaptor.getValue();
+    
+        // Assert that the argument's fields have the expected values
+        assertThat(capturedUser.getUsername()).isEqualTo(user.getUsername());
+        assertThat(capturedUser.getPassword()).isEqualTo(user.getPassword());
+        assertThat(capturedUser.getEmail()).isEqualTo(user.getEmail());
+        assertThat(capturedUser.getFirstName()).isEqualTo(user.getFirstName());
+        assertThat(capturedUser.getLastName()).isEqualTo(user.getLastName());
+        assertThat(capturedUser.getCanPostOffer()).isEqualTo(user.getCanPostOffer());
+    
+        // Assert that the returned user ID matches the expected value (this might need to be adapted depending on how you deal with IDs)
         assertThat(createdUserId).isEqualTo(user.getId());
     }
 }
