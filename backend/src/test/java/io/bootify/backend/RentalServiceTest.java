@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.lenient;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.BDDMockito.given;
@@ -58,7 +59,9 @@ class RentalServiceTest {
         // Initialize the Offer object
         Offer offer = new Offer();
         offer.setId(1L);
-
+        lenient().when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+        lenient().when(offerRepository.findById(any(Long.class))).thenReturn(Optional.of(offer));
+        
         // Initialize the Rental object
         rental = new Rental();
         rental.setId(1L);
