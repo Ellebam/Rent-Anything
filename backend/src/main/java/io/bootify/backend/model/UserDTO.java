@@ -1,8 +1,9 @@
 package io.bootify.backend.model;
 
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
+import io.bootify.backend.domain.Role;
 
 public class UserDTO {
 
@@ -30,6 +31,10 @@ public class UserDTO {
 
     @NotNull
     private Boolean canPostOffer;
+
+    private Role role;
+
+
 
     public Long getId() {
         return id;
@@ -87,4 +92,11 @@ public class UserDTO {
         this.canPostOffer = canPostOffer;
     }
 
+    public Role getRole() {
+        return role;
+    }
+    
+    public void setRole(final Role role) {
+        this.role = role;
+    }
 }

@@ -7,15 +7,20 @@ import io.bootify.backend.util.NotFoundException;
 import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(final UserRepository userRepository) {
+    public UserService(final UserRepository userRepository, final BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+
     }
 
     public List<UserDTO> findAll() {
@@ -34,6 +39,7 @@ public class UserService {
     public Long create(final UserDTO userDTO) {
         final User user = new User();
         mapToEntity(userDTO, user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user).getId();
     }
 
@@ -41,6 +47,7 @@ public class UserService {
         final User user = userRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
         mapToEntity(userDTO, user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -56,6 +63,7 @@ public class UserService {
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
         userDTO.setCanPostOffer(user.getCanPostOffer());
+        userDTO.setRole(user.getRole());
         return userDTO;
     }
 
@@ -66,6 +74,7 @@ public class UserService {
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
         user.setCanPostOffer(userDTO.getCanPostOffer());
+        user.setRole(userDTO.getRole());
         return user;
     }
 
@@ -73,4 +82,8 @@ public class UserService {
         return userRepository.existsByUsernameIgnoreCase(username);
     }
 
+    public boolean authenticate(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+    
 }

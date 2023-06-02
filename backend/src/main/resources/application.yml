@@ -27,3 +27,11 @@ logging:
   level:
     org:
       hibernate: DEBUG
+
+admin:
+  username: admin
+  password: admin
+  email: admin@example.com
+  firstName: Admin
+  lastName: User
+  canPostOffer: true

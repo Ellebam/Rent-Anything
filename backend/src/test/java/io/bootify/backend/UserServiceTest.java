@@ -14,12 +14,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -43,6 +47,9 @@ class UserServiceTest {
         userDTO.setFirstName("Test");
         userDTO.setLastName("User");
         userDTO.setCanPostOffer(true); 
+
+        // Mock the behavior of passwordEncoder.encode() method
+        given(passwordEncoder.encode(any(String.class))).willAnswer(invocation -> invocation.getArgument(0));
     
         // Mock the behavior of userRepository.save() method to return our user
         given(userRepository.save(any(User.class))).willReturn(user);

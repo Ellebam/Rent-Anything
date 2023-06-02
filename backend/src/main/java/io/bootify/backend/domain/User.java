@@ -61,6 +61,9 @@ public class User {
     @Column(nullable = false)
     private OffsetDateTime lastUpdated;
 
+    private Role role;
+
+
     public Long getId() {
         return id;
     }
@@ -163,6 +166,14 @@ public class User {
 
     public void setLastUpdated(final OffsetDateTime lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(final Role role) {
+        this.role = role;
     }
 
 }
