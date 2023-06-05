@@ -26,6 +26,8 @@ springdoc:
 logging:
   level:
     org:
+      springframework:
+        security: DEBUG
       hibernate: DEBUG
 
 admin:
