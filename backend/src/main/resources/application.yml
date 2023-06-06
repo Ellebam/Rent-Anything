@@ -30,10 +30,26 @@ logging:
         security: DEBUG
       hibernate: DEBUG
 
-admin:
-  username: admin
-  password: admin
-  email: admin@example.com
-  firstName: Admin
-  lastName: User
-  canPostOffer: true
+users:
+  initial:
+    - username: admin
+      password: admin
+      email: admin@example.com
+      firstName: Admin
+      lastName: User
+      canPostOffer: true
+      role: ADMIN
+    - username: poster
+      password: poster
+      email: poster@example.com
+      firstName: Poster
+      lastName: User
+      canPostOffer: true
+      role: POSTER
+    - username: renter
+      password: renter
+      email: renter@example.com
+      firstName: Renter
+      lastName: User
+      canPostOffer: false
+      role: RENTER

@@ -18,7 +18,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz -> authz
                 // Any request must be authenticated with a user who has the role of 'ADMIN'
-                .anyRequest().hasAnyRole("ADMIN")
+                .anyRequest().hasAnyRole("ADMIN", "POSTER", "RENTER")
             )
             // Use basic HTTP authentication for security
             .httpBasic(Customizer.withDefaults());
