@@ -1,22 +1,17 @@
 package io.bootify.backend.rest;
 
 import io.bootify.backend.model.UserDTO;
+import io.bootify.backend.model.UserUpdateDTO;
 import io.bootify.backend.service.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,11 +29,13 @@ public class UserResource {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<UserDTO> getUser(@PathVariable(name = "id") final Long id) {
         return ResponseEntity.ok(userService.get(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ApiResponse(responseCode = "201")
     public ResponseEntity<Long> createUser(@RequestBody @Valid final UserDTO userDTO) {
         final Long createdId = userService.create(userDTO);
@@ -46,17 +43,19 @@ public class UserResource {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> updateUser(@PathVariable(name = "id") final Long id,
-            @RequestBody @Valid final UserDTO userDTO) {
-        userService.update(id, userDTO);
+                                           @RequestBody @Valid final UserUpdateDTO userUpdateDTO) {
+        userService.update(id, userUpdateDTO);
         return ResponseEntity.ok().build();
     }
 
+
     @DeleteMapping("/{id}")
+    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     @ApiResponse(responseCode = "204")
     public ResponseEntity<Void> deleteUser(@PathVariable(name = "id") final Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

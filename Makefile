@@ -31,6 +31,41 @@ backend-clean:
 	docker stop $(IMAGE_NAME):$(IMAGE_TAG)
 	docker rm $(IMAGE_NAME):$(IMAGE_TAG)
 
+backend-create-messages:
+	curl -X POST http://localhost:5000/api/offers \
+		-u poster:poster \
+		-H 'Content-Type: application/json' \
+		-d '{ \
+				"userId": 2, \
+				"title": "Sample offer", \
+				"description": "This is a sample offer.", \
+				"quantity": 1, \
+				"price": 100.00, \
+				"timestamp": "2023-06-06T15:00:00Z"\
+			}'
+
+	curl -X POST http://localhost:5000/api/messages \
+		-u poster:poster \
+		-H 'Content-Type: application/json' \
+		-d '{ \
+				"senderId": 2, \
+				"recipientId": 3, \
+				"offerId": 1, \
+				"content": "Hello renter, this is a message from poster.", \
+				"timestamp": "2023-06-06T15:00:00Z" \
+			}'
+
+	curl -X POST http://localhost:5000/api/messages \
+		-u renter:renter \
+		-H 'Content-Type: application/json' \
+		-d '{ \
+				"senderId": 3, \
+				"recipientId": 2, \
+				"offerId": 1, \
+				"content": "Hello poster, this is a reply from renter.", \
+				"timestamp": "2023-06-06T16:00:00Z" \
+			}'
+
 
 # Docker Compose targets
 compose-up:

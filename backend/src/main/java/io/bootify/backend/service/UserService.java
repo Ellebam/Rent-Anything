@@ -2,12 +2,18 @@ package io.bootify.backend.service;
 
 import io.bootify.backend.domain.User;
 import io.bootify.backend.model.UserDTO;
+import io.bootify.backend.model.UserUpdateDTO;
 import io.bootify.backend.repos.UserRepository;
 import io.bootify.backend.util.NotFoundException;
+import io.bootify.backend.domain.Role;
 import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.AccessDeniedException;
+
+
 
 
 
@@ -43,13 +49,38 @@ public class UserService {
         return userRepository.save(user).getId();
     }
 
-    public void update(final Long id, final UserDTO userDTO) {
+    public void update(final Long id, final UserUpdateDTO userUpdateDTO) {
         final User user = userRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
-        mapToEntity(userDTO, user);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    
+        // Get the role from the currentUser and remove the prefix "ROLE_"
+        String currentRole = currentUser.getRole().replace("ROLE_", "");
+    
+        if (currentRole.equals(user.getRole().name()) || currentUser.getId().equals(user.getId())) {
+            if (Role.valueOf(currentRole) == Role.ADMIN) {
+                if(userUpdateDTO.getUsername() != null) user.setUsername(userUpdateDTO.getUsername());
+                if(userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
+                if(userUpdateDTO.getFirstName() != null) user.setFirstName(userUpdateDTO.getFirstName());
+                if(userUpdateDTO.getLastName() != null) user.setLastName(userUpdateDTO.getLastName());
+                if(userUpdateDTO.getPassword() != null) user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
+                if(userUpdateDTO.getRole() != null) user.setRole(userUpdateDTO.getRole());
+                if(userUpdateDTO.getCanPostOffer() != null) user.setCanPostOffer(userUpdateDTO.getCanPostOffer());
+            } else if (!currentUser.getRole().equals(Role.ADMIN.name())) {
+                if(userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
+                if(userUpdateDTO.getFirstName() != null) user.setFirstName(userUpdateDTO.getFirstName());
+                if(userUpdateDTO.getLastName() != null) user.setLastName(userUpdateDTO.getLastName());
+                if(userUpdateDTO.getPassword() != null) user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
+            }
+            userRepository.save(user);
+        } else {
+            throw new AccessDeniedException("You don't have permission to perform this operation");
+        }
     }
+    
+    
+
+    
 
     public void delete(final Long id) {
         userRepository.deleteById(id);
