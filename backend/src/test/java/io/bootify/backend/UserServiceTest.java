@@ -1,5 +1,6 @@
 package io.bootify.backend;
 
+import io.bootify.backend.domain.Role;
 import io.bootify.backend.domain.User;
 import io.bootify.backend.repos.UserRepository;
 import io.bootify.backend.service.UserService;
@@ -38,7 +39,7 @@ class UserServiceTest {
         user.setEmail("test@email.com");
         user.setFirstName("Test");
         user.setLastName("User");
-        user.setCanPostOffer(true); 
+        user.setRole(Role.POSTER); 
     
         UserDTO userDTO = new UserDTO();
         userDTO.setUsername("test");
@@ -46,7 +47,7 @@ class UserServiceTest {
         userDTO.setEmail("test@email.com");
         userDTO.setFirstName("Test");
         userDTO.setLastName("User");
-        userDTO.setCanPostOffer(true); 
+        userDTO.setRole(Role.POSTER); 
 
         // Mock the behavior of passwordEncoder.encode() method
         given(passwordEncoder.encode(any(String.class))).willAnswer(invocation -> invocation.getArgument(0));
@@ -73,6 +74,7 @@ class UserServiceTest {
         assertThat(capturedUser.getFirstName()).isEqualTo(user.getFirstName());
         assertThat(capturedUser.getLastName()).isEqualTo(user.getLastName());
         assertThat(capturedUser.getCanPostOffer()).isEqualTo(user.getCanPostOffer());
+        assertThat(capturedUser.getRole()).isEqualTo(user.getRole());
     
         // Assert that the returned user ID matches the expected value (this might need to be adapted depending on how you deal with IDs)
         assertThat(createdUserId).isEqualTo(user.getId());

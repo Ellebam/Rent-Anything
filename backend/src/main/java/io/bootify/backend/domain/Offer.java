@@ -10,10 +10,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+
 
 import java.math.BigDecimal;
+
 import java.time.OffsetDateTime;
+
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,8 +48,8 @@ public class Offer {
     @Column
     private BigDecimal price;
 
-    @Column
-    private String imageUrl;
+    @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OfferImage> offerImages = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -98,12 +106,12 @@ public class Offer {
         this.price = price;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public List<OfferImage> getOfferImages() {
+        return offerImages;
     }
 
-    public void setImageUrl(final String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setOfferImages(List<OfferImage> offerImages) {
+        this.offerImages = offerImages;
     }
 
     public User getUser() {

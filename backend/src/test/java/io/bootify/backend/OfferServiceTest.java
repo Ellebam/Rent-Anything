@@ -1,9 +1,11 @@
 package io.bootify.backend;
 
 import io.bootify.backend.domain.Offer;
+import io.bootify.backend.domain.OfferImage;
 import io.bootify.backend.domain.User;
 import io.bootify.backend.repos.OfferRepository;
 import io.bootify.backend.repos.UserRepository;
+import io.bootify.backend.repos.OfferImageRepository;
 import io.bootify.backend.service.OfferService;
 import io.bootify.backend.model.OfferDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
 
 // Define test class with Mockito extension
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +32,10 @@ class OfferServiceTest {
     // Mock dependencies
     @Mock
     private OfferRepository offerRepository;
-
+    
+    @Mock
+    private OfferImageRepository offerImageRepository;
+    
     @Mock
     private UserRepository userRepository;
 
@@ -46,6 +53,11 @@ class OfferServiceTest {
         User user = new User();
         user.setId(1L);
 
+        // Create an OfferImage with an empty path
+        OfferImage offerImage = new OfferImage("", offer);;
+        List<OfferImage> offerImages = new ArrayList<>();
+        offerImages.add(offerImage);
+
         // Initialize the Offer object
         offer = new Offer();
         offer.setId(1L);
@@ -53,7 +65,7 @@ class OfferServiceTest {
         offer.setDescription("This is a test offer");
         offer.setLocation("Test location");
         offer.setPrice(new BigDecimal("999.99"));
-        offer.setImageUrl("http://test.com/image.jpg");
+        offer.setOfferImages(offerImages);
         offer.setUser(user);
 
         // Initialize the OfferDTO object
@@ -62,7 +74,8 @@ class OfferServiceTest {
         offerDTO.setDescription("This is a new test offer");
         offerDTO.setLocation("New test location");
         offerDTO.setPrice(new BigDecimal("1999.99"));
-        offerDTO.setImageUrl("http://newtest.com/image.jpg");
+        offerDTO.setImageUrls(new ArrayList<>());
+
     }
     // Test that Offer is correctly created
     @Test
@@ -83,7 +96,6 @@ class OfferServiceTest {
         assertThat(capturedOffer.getDescription()).isEqualTo(offerDTO.getDescription());
         assertThat(capturedOffer.getLocation()).isEqualTo(offerDTO.getLocation());
         assertThat(capturedOffer.getPrice()).isEqualTo(offerDTO.getPrice());
-        assertThat(capturedOffer.getImageUrl()).isEqualTo(offerDTO.getImageUrl());
 
         assertThat(createdOfferId).isEqualTo(offer.getId());
     }
@@ -107,7 +119,6 @@ class OfferServiceTest {
         assertThat(capturedOffer.getDescription()).isEqualTo(offerDTO.getDescription());
         assertThat(capturedOffer.getLocation()).isEqualTo(offerDTO.getLocation());
         assertThat(capturedOffer.getPrice()).isEqualTo(offerDTO.getPrice());
-        assertThat(capturedOffer.getImageUrl()).isEqualTo(offerDTO.getImageUrl());
     }
     // Test that Offer is correctly deleted
     @Test
@@ -132,6 +143,8 @@ class OfferServiceTest {
         assertThat(foundOfferDTO.getDescription()).isEqualTo(offer.getDescription());
         assertThat(foundOfferDTO.getLocation()).isEqualTo(offer.getLocation());
         assertThat(foundOfferDTO.getPrice()).isEqualTo(offer.getPrice());
-        assertThat(foundOfferDTO.getImageUrl()).isEqualTo(offer.getImageUrl());
+
+
     }
+
 }

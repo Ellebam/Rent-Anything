@@ -48,7 +48,6 @@ public class AppStartUpService {
             userDTO.setEmail(email);
             userDTO.setFirstName(firstName);
             userDTO.setLastName(lastName);
-            userDTO.setCanPostOffer(canPostOffer);
             userDTO.setRole(role);
             userService.create(userDTO);
         }

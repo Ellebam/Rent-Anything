@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping(value = "/api/offers", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,24 +41,27 @@ public class OfferResource {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_POSTER') or hasRole('ROLE_ADMIN')")
     @ApiResponse(responseCode = "201")
-    public ResponseEntity<Long> createOffer(@RequestBody @Valid final OfferDTO offerDTO) {
-        final Long createdId = offerService.create(offerDTO);
+    public ResponseEntity<Long> createOffer(@RequestBody @Valid OfferDTO offerDTO, 
+                                            @RequestParam(value="images", required=false) List<MultipartFile> images) {
+        final Long createdId = offerService.create(offerDTO, images);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> updateOffer(@PathVariable(name = "id") final Long id,
-            @RequestBody @Valid final OfferDTO offerDTO) {
+                                            @RequestBody @Valid final OfferDTO offerDTO) {
         offerService.update(id, offerDTO);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
     @ApiResponse(responseCode = "204")
     public ResponseEntity<Void> deleteOffer(@PathVariable(name = "id") final Long id) {
         offerService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

@@ -1,6 +1,8 @@
 package io.bootify.backend.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -38,8 +40,6 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
-    private Boolean canPostOffer;
 
     @OneToMany(mappedBy = "user")
     private Set<Offer> offers;
@@ -61,7 +61,10 @@ public class User {
     @Column(nullable = false)
     private OffsetDateTime lastUpdated;
 
-    private Role role;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.RENTER;
+    
 
 
     public Long getId() {
@@ -113,12 +116,9 @@ public class User {
     }
 
     public Boolean getCanPostOffer() {
-        return canPostOffer;
+        return role == Role.ADMIN || role == Role.POSTER;
     }
 
-    public void setCanPostOffer(final Boolean canPostOffer) {
-        this.canPostOffer = canPostOffer;
-    }
 
     public Set<Offer> getOffers() {
         return offers;

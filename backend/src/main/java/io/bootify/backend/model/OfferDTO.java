@@ -3,6 +3,9 @@ package io.bootify.backend.model;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class OfferDTO {
 
@@ -25,8 +28,7 @@ public class OfferDTO {
     @NotNull
     private Integer quantity;
 
-    @Size(max = 255)
-    private String imageUrl;
+    private List<String> imageUrls = new ArrayList<>();
 
     private Long userId;
 
@@ -77,13 +79,12 @@ public class OfferDTO {
     public void setQuantity(final Integer quantity) {
         this.quantity = quantity;
     }
-
-    public String getImageUrl() {
-        return imageUrl;
+    public List<String> getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImageUrl(final String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     public Long getUserId() {

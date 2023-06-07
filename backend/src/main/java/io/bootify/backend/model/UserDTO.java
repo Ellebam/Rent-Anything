@@ -29,10 +29,9 @@ public class UserDTO {
     @Size(max = 255)
     private String lastName;
 
-    @NotNull
-    private Boolean canPostOffer;
 
-    private Role role;
+    @NotNull
+    private Role role = Role.RENTER;
 
 
 
@@ -84,12 +83,8 @@ public class UserDTO {
         this.lastName = lastName;
     }
 
-    public Boolean getCanPostOffer() {
-        return canPostOffer;
-    }
-
-    public void setCanPostOffer(final Boolean canPostOffer) {
-        this.canPostOffer = canPostOffer;
+    public boolean canPostOffer() {
+        return role == Role.ADMIN || role == Role.POSTER;
     }
 
     public Role getRole() {

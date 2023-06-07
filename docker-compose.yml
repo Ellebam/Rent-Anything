@@ -11,6 +11,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
     ports:
       - 5000:8080
+    volumes: 
+      - images_data:/app/images
     container_name: rent-anything-backend
     networks:
       - prod
@@ -49,3 +51,4 @@ networks:
 
 volumes:
   db_data:
+  images_data:

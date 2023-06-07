@@ -49,34 +49,51 @@ public class UserService {
         return userRepository.save(user).getId();
     }
 
+        /**
+     * Updates the user with the given id using the provided UserUpdateDTO object.
+     *
+     * If the current user is ADMIN, they can update almost any field of any user. 
+     * If the current user is not an ADMIN, they can only update their own information,
+     * specifically their email, first name, last name, and password.
+     *
+     * @param id the id of the user to update
+     * @param userUpdateDTO the UserUpdateDTO object containing the new user information
+     * @throws NotFoundException if a user with the given id is not found
+     * @throws AccessDeniedException if the current user is not authorized to update the specified user
+     * @throws IllegalArgumentException if a non-ADMIN user attempts to update fields they are not allowed to
+     */
     public void update(final Long id, final UserUpdateDTO userUpdateDTO) {
         final User user = userRepository.findById(id)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
         CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    
-        // Get the role from the currentUser and remove the prefix "ROLE_"
+        
         String currentRole = currentUser.getRole().replace("ROLE_", "");
-    
-        if (currentRole.equals(user.getRole().name()) || currentUser.getId().equals(user.getId())) {
+        
+        if (Role.valueOf(currentRole) == Role.ADMIN || currentUser.getId().equals(user.getId())) {
             if (Role.valueOf(currentRole) == Role.ADMIN) {
-                if(userUpdateDTO.getUsername() != null) user.setUsername(userUpdateDTO.getUsername());
-                if(userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
-                if(userUpdateDTO.getFirstName() != null) user.setFirstName(userUpdateDTO.getFirstName());
-                if(userUpdateDTO.getLastName() != null) user.setLastName(userUpdateDTO.getLastName());
-                if(userUpdateDTO.getPassword() != null) user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
-                if(userUpdateDTO.getRole() != null) user.setRole(userUpdateDTO.getRole());
-                if(userUpdateDTO.getCanPostOffer() != null) user.setCanPostOffer(userUpdateDTO.getCanPostOffer());
-            } else if (!currentUser.getRole().equals(Role.ADMIN.name())) {
-                if(userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
-                if(userUpdateDTO.getFirstName() != null) user.setFirstName(userUpdateDTO.getFirstName());
-                if(userUpdateDTO.getLastName() != null) user.setLastName(userUpdateDTO.getLastName());
-                if(userUpdateDTO.getPassword() != null) user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
+                updateUserFields(user, userUpdateDTO, true);
+            } else {
+                if(userUpdateDTO.getUsername() != null || userUpdateDTO.getRole() != null || userUpdateDTO.getCanPostOffer() != null) {
+                    throw new IllegalArgumentException("You are not allowed to update username, role or canPostOffer fields");
+                }
+                updateUserFields(user, userUpdateDTO, false);
             }
             userRepository.save(user);
         } else {
             throw new AccessDeniedException("You don't have permission to perform this operation");
         }
     }
+    
+    private void updateUserFields(User user, UserUpdateDTO userUpdateDTO, boolean isAdmin) {
+        if(userUpdateDTO.getUsername() != null && isAdmin) user.setUsername(userUpdateDTO.getUsername());
+        if(userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
+        if(userUpdateDTO.getFirstName() != null) user.setFirstName(userUpdateDTO.getFirstName());
+        if(userUpdateDTO.getLastName() != null) user.setLastName(userUpdateDTO.getLastName());
+        if(userUpdateDTO.getPassword() != null) user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
+        if(userUpdateDTO.getRole() != null && isAdmin) user.setRole(userUpdateDTO.getRole());
+    }
+    
+    
     
     
 
@@ -93,7 +110,6 @@ public class UserService {
         userDTO.setEmail(user.getEmail());
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
-        userDTO.setCanPostOffer(user.getCanPostOffer());
         userDTO.setRole(user.getRole());
         return userDTO;
     }
@@ -104,7 +120,6 @@ public class UserService {
         user.setEmail(userDTO.getEmail());
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
-        user.setCanPostOffer(userDTO.getCanPostOffer());
         user.setRole(userDTO.getRole());
         return user;
     }
