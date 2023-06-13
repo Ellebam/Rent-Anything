@@ -20,6 +20,12 @@ spring:
             non_contextual_creation: true
         id:
           new_generator_mappings: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 5MB
+      max-request:size: 215MB
 springdoc:
   pathsToMatch: /api/**
 
