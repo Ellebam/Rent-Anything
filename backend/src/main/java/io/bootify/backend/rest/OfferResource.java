@@ -1,6 +1,7 @@
 package io.bootify.backend.rest;
 
 import io.bootify.backend.model.OfferDTO;
+import io.bootify.backend.model.OfferRequestDTO;
 import io.bootify.backend.service.OfferService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -10,14 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
@@ -43,11 +43,11 @@ public class OfferResource {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_POSTER') or hasRole('ROLE_ADMIN')")
     @ApiResponse(responseCode = "201")
-    public ResponseEntity<Long> createOffer(@RequestBody @Valid OfferDTO offerDTO, 
-                                            @RequestParam(value="images", required=false) List<MultipartFile> images) {
-        final Long createdId = offerService.create(offerDTO, images);
+    public ResponseEntity<Long> createOffer(@ModelAttribute OfferRequestDTO offerRequestDTO) {
+        final Long createdId = offerService.create(offerRequestDTO.getOfferDTO(), offerRequestDTO.getImages());
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
+
 
     @PutMapping("/{id}")
     @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
