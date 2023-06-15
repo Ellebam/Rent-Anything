@@ -66,6 +66,16 @@ backend-create-messages:
 				"timestamp": "2023-06-06T16:00:00Z" \
 			}'
 
+backend-create-image-offer:
+	curl -X POST http://localhost:5000/api/offers \
+		-u poster:poster \
+		-F "offerDTO.userId=2" \
+		-F "offerDTO.title=Sample multiple image offer" \
+		-F "offerDTO.description=This is a sample offer with images." \
+		-F "offerDTO.quantity=1" \
+		-F "offerDTO.price=100.00" \
+		-F "images=@backend/static/cirquit_board_compressed_01.jpg" \
+		-F "images=@backend/static/turtle.jpg"
 
 # Docker Compose targets
 compose-up:

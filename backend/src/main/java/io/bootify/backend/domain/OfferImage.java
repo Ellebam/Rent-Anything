@@ -29,6 +29,9 @@ public class OfferImage {
     @Column(nullable = false)
     private int imageOrder;
 
+    public OfferImage() {
+    }
+    
     public OfferImage(String imagePath, Offer offer) {
         this.imagePath = imagePath;
         this.offer = offer;

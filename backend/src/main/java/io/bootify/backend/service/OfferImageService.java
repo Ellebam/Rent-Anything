@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,20 +31,41 @@ public class OfferImageService {
     }
     @Transactional
     public void saveImages(Long offerId, List<MultipartFile> images) throws IOException {
+        // Get the offer for the given offerId. If the offer doesn't exist, throw an exception.
         Offer offer = offerRepository.findById(offerId)
             .orElseThrow(() -> new IllegalArgumentException("Offer not found"));
-    
+        
+        // Construct the path of the directory where the offer's images will be saved.
+        String offerImagesDirectoryPath = "/app/images/" + offerId;
+        File directory = new File(offerImagesDirectoryPath);
+
+        // If the directory doesn't exist, create it.
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        // Iterate over the images provided in the request.
         for (int i = 0; i < images.size(); i++) {
             MultipartFile image = images.get(i);
-            Path path = Paths.get("/app/images/" + image.getOriginalFilename());
-            Files.copy(image.getInputStream(), path);
-
-            OfferImage offerImage = new OfferImage(path.toString(), offer);  // updated this line to use the constructor
-            offerImage.setImageOrder(i);
-
-            offerImageRepository.save(offerImage);
+            String originalFilename = image.getOriginalFilename();
+            
+            // Security check: make sure the filename doesn't contain any harmful characters.
+            if (originalFilename != null && originalFilename.matches("[a-zA-Z0-9_.-]*")) {
+                Path path = Paths.get(offerImagesDirectoryPath + "/" + originalFilename);
+                
+                // Copy the image file to the directory.
+                Files.copy(image.getInputStream(), path);
+                
+                // Create an OfferImage entity for the image, set its properties, and save it to the repository.
+                OfferImage offerImage = new OfferImage(path.toString(), offer);
+                offerImage.setImageOrder(i+1);
+                offerImageRepository.save(offerImage);
+            } else {
+                throw new IllegalArgumentException("Invalid filename");
+            }
         }
     }
+
     
     
     
