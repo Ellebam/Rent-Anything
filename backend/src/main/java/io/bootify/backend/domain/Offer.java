@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.CascadeType;
 
 
@@ -48,6 +49,10 @@ public class Offer {
     @Column
     private BigDecimal price;
 
+    @Column(name = "is_deactivated", nullable = false)
+    private boolean isDeactivated = false;
+
+
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OfferImage> offerImages = new ArrayList<>();
 
@@ -55,8 +60,11 @@ public class Offer {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "offer")
+    @OneToMany(mappedBy = "offer", cascade =  CascadeType.ALL, orphanRemoval = true)
     private Set<RentalApplication> rentalApplications;
+
+    @OneToOne(mappedBy = "offer", cascade =  CascadeType.ALL, orphanRemoval = true)
+    private Rental rental;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -130,6 +138,14 @@ public class Offer {
         this.rentalApplications = rentalApplications;
     }
 
+    public Rental getRental() {
+        return rental;
+    }
+
+    public void setRental(Rental rental) {
+        this.rental = rental;
+    }
+
     public OffsetDateTime getDateCreated() {
         return dateCreated;
     }
@@ -146,4 +162,12 @@ public class Offer {
         this.lastUpdated = lastUpdated;
     }
 
+    public Boolean isDeactivated () {
+        return isDeactivated;
+    }
+
+    public void setIsDeactivated (boolean isDeactivated) {
+        this.isDeactivated = isDeactivated;
+    }
 }
+

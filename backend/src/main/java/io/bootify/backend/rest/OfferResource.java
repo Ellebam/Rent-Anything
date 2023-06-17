@@ -47,6 +47,22 @@ public class OfferResource {
         final Long createdId = offerService.create(offerRequestDTO.getOfferDTO(), offerRequestDTO.getImages());
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
+    
+    @PostMapping("/no-image")
+    @PreAuthorize("hasRole('ROLE_POSTER') or hasRole('ROLE_ADMIN')")
+    @ApiResponse(responseCode = "201")
+    public ResponseEntity<Long> createOfferWithoutImage(@RequestBody OfferDTO offerDTO) {
+        final Long createdId = offerService.create(offerDTO);
+        return new ResponseEntity<>(createdId, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}/deactivate")
+    @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    @ApiResponse(responseCode = "204")
+    public ResponseEntity<Void> deactivateOffer(@PathVariable(name = "id") final Long id) {
+        offerService.deactivate(id);
+        return ResponseEntity.noContent().build();
+    }
 
 
     @PutMapping("/{id}")
@@ -58,7 +74,7 @@ public class OfferResource {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ApiResponse(responseCode = "204")
     public ResponseEntity<Void> deleteOffer(@PathVariable(name = "id") final Long id) {
         offerService.delete(id);

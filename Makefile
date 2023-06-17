@@ -31,8 +31,8 @@ backend-clean:
 	docker stop $(IMAGE_NAME):$(IMAGE_TAG)
 	docker rm $(IMAGE_NAME):$(IMAGE_TAG)
 
-backend-create-messages:
-	curl -X POST http://localhost:5000/api/offers \
+backend-create-offer:
+	curl -X POST http://localhost:5000/api/offers/no-image \
 		-u poster:poster \
 		-H 'Content-Type: application/json' \
 		-d '{ \
@@ -43,7 +43,7 @@ backend-create-messages:
 				"price": 100.00, \
 				"timestamp": "2023-06-06T15:00:00Z"\
 			}'
-
+backend-create-messages:
 	curl -X POST http://localhost:5000/api/messages \
 		-u poster:poster \
 		-H 'Content-Type: application/json' \
@@ -76,6 +76,8 @@ backend-create-image-offer:
 		-F "offerDTO.price=100.00" \
 		-F "images=@backend/static/cirquit_board_compressed_01.jpg" \
 		-F "images=@backend/static/turtle.jpg"
+
+backend-create-all: backend-create-offer backend-create-messages backend-create-image-offer
 
 # Docker Compose targets
 compose-up:

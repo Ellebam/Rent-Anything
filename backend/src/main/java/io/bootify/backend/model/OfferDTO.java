@@ -32,6 +32,8 @@ public class OfferDTO {
 
     private Long userId;
 
+    private Boolean isDeactivated = false;
+
     public Long getId() {
         return id;
     }
@@ -95,4 +97,11 @@ public class OfferDTO {
         this.userId = userId;
     }
 
+    public Boolean isDeactivated() {
+        return isDeactivated;
+    }
+
+    public void setIsDeactivated (boolean isDeactivated) {
+        this.isDeactivated = isDeactivated;
+    }
 }

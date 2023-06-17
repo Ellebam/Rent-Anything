@@ -46,11 +46,17 @@ public class OfferService {
                 .orElseThrow(NotFoundException::new);
     }
     public Long create(final OfferDTO offerDTO) {
+        if (offerDTO == null) {
+            throw new IllegalArgumentException("OfferDTO cannot be null (from overloaded method).");
+        }
         return this.create(offerDTO, null);
     }
 
     @Transactional
     public Long create(final OfferDTO offerDTO, List<MultipartFile> images) {
+        if (offerDTO == null) {
+            throw new IllegalArgumentException("OfferDTO cannot be null (from overloaded method).");
+        }
         final Offer offer = new Offer();
         mapToEntity(offerDTO, offer);
         Long id = offerRepository.save(offer).getId();
@@ -91,6 +97,7 @@ public class OfferService {
                                        .collect(Collectors.toList());
         offerDTO.setImageUrls(imageUrls);
         offerDTO.setUserId(offer.getUser() != null ? offer.getUser().getId() : null);
+        offer.setIsDeactivated(offer.isDeactivated());
         return offerDTO;
     }
 
@@ -110,7 +117,18 @@ public class OfferService {
         } else {
             offer.setUser(null);
         }
+        offer.setIsDeactivated(offerDTO.isDeactivated());
         return offer;
     }
+
+    @Transactional
+    public void deactivate(Long id) {
+        Offer offer = offerRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Offer not found"));
+        
+        offer.setIsDeactivated(true);
+        offerRepository.save(offer);
+}
+
 
 }
