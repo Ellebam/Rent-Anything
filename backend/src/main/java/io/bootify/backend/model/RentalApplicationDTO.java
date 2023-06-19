@@ -13,7 +13,7 @@ public class RentalApplicationDTO {
     private Long offerId;
 
     @NotNull
-    private Boolean isApproved;
+    private Boolean isApproved = false;
 
     public Long getId() {
         return id;

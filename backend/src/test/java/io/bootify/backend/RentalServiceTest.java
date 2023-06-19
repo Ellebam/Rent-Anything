@@ -6,6 +6,7 @@ import io.bootify.backend.domain.Offer;
 import io.bootify.backend.repos.RentalRepository;
 import io.bootify.backend.repos.UserRepository;
 import io.bootify.backend.repos.OfferRepository;
+import io.bootify.backend.service.CustomUserDetails;
 import io.bootify.backend.service.RentalService;
 import io.bootify.backend.model.RentalDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,8 @@ import org.mockito.Mock;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.BDDMockito.given;
@@ -69,6 +72,7 @@ class RentalServiceTest {
         rental.setOffer(offer);
         rental.setStartDate(OffsetDateTime.now());
         rental.setEndDate(OffsetDateTime.now().plusDays(7));
+        rental.setIsFinished(false);
 
         // Initialize the RentalDTO object
         rentalDTO = new RentalDTO();
@@ -76,6 +80,7 @@ class RentalServiceTest {
         rentalDTO.setOfferId(1L);
         rentalDTO.setStartDate(OffsetDateTime.now().plusDays(10));
         rentalDTO.setEndDate(OffsetDateTime.now().plusDays(17));
+        rentalDTO.setIsFinished(false);
     }
 
     /**
@@ -88,8 +93,22 @@ class RentalServiceTest {
         // Given
         given(rentalRepository.save(any(Rental.class))).willReturn(rental);
 
+        // Mock the CustomUserDetails
+        CustomUserDetails userDetails = mock(CustomUserDetails.class);
+        given(userDetails.getId()).willReturn(1L);
+
+        // Mock the User object linked to Offer
+        User offerUser = mock(User.class);
+        given(offerUser.getId()).willReturn(1L);
+
+        // Mock the Offer object
+        Offer mockOffer = mock(Offer.class);
+        given(mockOffer.getUser()).willReturn(offerUser);
+        given(mockOffer.getId()).willReturn(1L);
+        given(offerRepository.findById(any(Long.class))).willReturn(Optional.of(mockOffer));
+        
         // When
-        Long createdRentalId = rentalService.create(rentalDTO);
+        Long createdRentalId = rentalService.create(rentalDTO, userDetails);
 
         // Then
         ArgumentCaptor<Rental> rentalArgumentCaptor = ArgumentCaptor.forClass(Rental.class);
@@ -100,9 +119,13 @@ class RentalServiceTest {
         assertThat(capturedRental.getOffer().getId()).isEqualTo(rentalDTO.getOfferId());
         assertThat(capturedRental.getStartDate()).isEqualTo(rentalDTO.getStartDate());
         assertThat(capturedRental.getEndDate()).isEqualTo(rentalDTO.getEndDate());
+        assertThat(capturedRental.getIsFinished()).isEqualTo(rentalDTO.getIsFinished());
 
         assertThat(createdRentalId).isEqualTo(rental.getId());
     }
+
+
+
 
     /**
      * Test case for the update method of RentalService.
@@ -112,11 +135,33 @@ class RentalServiceTest {
     @Test
     void shouldUpdateRental() {
         // Given
+        // Mock the CustomUserDetails
+        CustomUserDetails userDetails = mock(CustomUserDetails.class);
+        given(userDetails.getId()).willReturn(1L);
+
+        // Mock the User object linked to Offer
+        User offerUser = mock(User.class);
+        given(offerUser.getId()).willReturn(1L);
+
+        // Mock the Offer object
+        Offer mockOffer = mock(Offer.class);
+        given(mockOffer.getUser()).willReturn(offerUser);
+        given(mockOffer.getId()).willReturn(1L);
+        given(offerRepository.findById(any(Long.class))).willReturn(Optional.of(mockOffer));
+
+        // Initialize the Rental object
+        Rental rental = new Rental();
+        rental.setRenter(offerUser);
+        rental.setOffer(mockOffer);
+        rental.setStartDate(OffsetDateTime.now());
+        rental.setEndDate(OffsetDateTime.now().plusDays(7));
+        rental.setIsFinished(false);
+
         given(rentalRepository.findById(any(Long.class))).willReturn(Optional.of(rental));
         given(rentalRepository.save(any(Rental.class))).willReturn(rental);
 
         // When
-        rentalService.update(1L, rentalDTO);
+        rentalService.update(1L, rentalDTO, userDetails);
 
         // Then
         ArgumentCaptor<Rental> rentalArgumentCaptor = ArgumentCaptor.forClass(Rental.class);
@@ -127,7 +172,10 @@ class RentalServiceTest {
         assertThat(capturedRental.getOffer().getId()).isEqualTo(rentalDTO.getOfferId());
         assertThat(capturedRental.getStartDate()).isEqualTo(rentalDTO.getStartDate());
         assertThat(capturedRental.getEndDate()).isEqualTo(rentalDTO.getEndDate());
+        assertThat(capturedRental.getIsFinished()).isEqualTo(rentalDTO.getIsFinished());
     }
+
+
 
     /**
      * Test case for the delete method of RentalService.
@@ -163,5 +211,8 @@ class RentalServiceTest {
         assertThat(foundRental.getOfferId()).isEqualTo(rental.getOffer().getId());
         assertThat(foundRental.getStartDate()).isEqualTo(rental.getStartDate());
         assertThat(foundRental.getEndDate()).isEqualTo(rental.getEndDate());
+        assertThat(foundRental.getIsFinished()).isEqualTo(rental.getIsFinished());
+
+        
     }
 }

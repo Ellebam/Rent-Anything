@@ -40,6 +40,13 @@ public class RentalApplicationService {
                 .orElseThrow(NotFoundException::new);
     }
 
+    public Long getOffererId(final Long id) {
+        final RentalApplication rentalApplication = rentalApplicationRepository.findByIdWithOfferAndUser(id)
+                .orElseThrow(NotFoundException::new);
+        return rentalApplication.getOffer().getUser().getId();
+    }
+
+
     public Long create(final RentalApplicationDTO rentalApplicationDTO) {
         final RentalApplication rentalApplication = new RentalApplication();
         mapToEntity(rentalApplicationDTO, rentalApplication);
@@ -50,6 +57,14 @@ public class RentalApplicationService {
         final RentalApplication rentalApplication = rentalApplicationRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
         mapToEntity(rentalApplicationDTO, rentalApplication);
+        rentalApplicationRepository.save(rentalApplication);
+    }
+
+
+    public void approve(final Long id) {
+        final RentalApplication rentalApplication = rentalApplicationRepository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        rentalApplication.setApproved(true);
         rentalApplicationRepository.save(rentalApplication);
     }
 

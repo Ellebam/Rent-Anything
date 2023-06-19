@@ -33,7 +33,7 @@ public class RentalApplication {
     private Offer offer;
 
     @Column(nullable = false)
-    private Boolean isApproved;
+    private Boolean isApproved = false;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

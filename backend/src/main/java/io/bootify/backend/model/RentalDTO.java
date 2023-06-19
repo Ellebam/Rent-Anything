@@ -17,6 +17,8 @@ public class RentalDTO {
     private OffsetDateTime startDate;
 
     private OffsetDateTime endDate;
+    
+    private boolean isFinished = false;
 
     public Long getId() {
         return id;
@@ -56,6 +58,14 @@ public class RentalDTO {
 
     public void setEndDate(final OffsetDateTime endDate) {
         this.endDate = endDate;
+    }
+
+    public boolean getIsFinished() {
+    return this.isFinished;
+    }
+
+    public void setIsFinished(boolean isFinished) {
+    this.isFinished = isFinished;
     }
 
 }

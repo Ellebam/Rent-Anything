@@ -47,7 +47,7 @@ public class OfferService {
     }
     public Long create(final OfferDTO offerDTO) {
         if (offerDTO == null) {
-            throw new IllegalArgumentException("OfferDTO cannot be null (from overloaded method).");
+            throw new IllegalArgumentException("OfferDTO cannot be null");
         }
         return this.create(offerDTO, null);
     }
@@ -55,7 +55,7 @@ public class OfferService {
     @Transactional
     public Long create(final OfferDTO offerDTO, List<MultipartFile> images) {
         if (offerDTO == null) {
-            throw new IllegalArgumentException("OfferDTO cannot be null (from overloaded method).");
+            throw new IllegalArgumentException("OfferDTO cannot be null");
         }
         final Offer offer = new Offer();
         mapToEntity(offerDTO, offer);

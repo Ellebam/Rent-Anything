@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,17 +30,25 @@ public class RentalApplicationResource {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<RentalApplicationDTO>> getAllRentalApplications() {
         return ResponseEntity.ok(rentalApplicationService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(
+    "@rentalApplicationService.get(#id).getApplicantId() == authentication.principal.id or "
+        + "@rentalApplicationService.getOffererId(#id) == authentication.principal.id or "
+        + "hasRole('ROLE_ADMIN')"
+    )
     public ResponseEntity<RentalApplicationDTO> getRentalApplication(
             @PathVariable(name = "id") final Long id) {
         return ResponseEntity.ok(rentalApplicationService.get(id));
     }
 
+
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     @ApiResponse(responseCode = "201")
     public ResponseEntity<Long> createRentalApplication(
             @RequestBody @Valid final RentalApplicationDTO rentalApplicationDTO) {
@@ -48,13 +57,21 @@ public class RentalApplicationResource {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@rentalApplicationService.get(#id).getApplicantId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> updateRentalApplication(@PathVariable(name = "id") final Long id,
             @RequestBody @Valid final RentalApplicationDTO rentalApplicationDTO) {
         rentalApplicationService.update(id, rentalApplicationDTO);
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}/approve")
+    @PreAuthorize("@rentalApplicationService.getOffererId(#id) == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> approveRentalApplication(@PathVariable(name = "id") final Long id) {
+        rentalApplicationService.approve(id);
+        return ResponseEntity.ok().build();
+    }
     @DeleteMapping("/{id}")
+    @PreAuthorize("@rentalApplicationService.get(#id).getApplicantId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
     @ApiResponse(responseCode = "204")
     public ResponseEntity<Void> deleteRentalApplication(@PathVariable(name = "id") final Long id) {
         rentalApplicationService.delete(id);

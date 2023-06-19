@@ -31,6 +31,7 @@ backend-clean:
 	docker stop $(IMAGE_NAME):$(IMAGE_TAG)
 	docker rm $(IMAGE_NAME):$(IMAGE_TAG)
 
+## Backend object creation and manipulation
 backend-create-offer:
 	curl -X POST http://localhost:5000/api/offers/no-image \
 		-u poster:poster \
@@ -77,7 +78,23 @@ backend-create-image-offer:
 		-F "images=@backend/static/cirquit_board_compressed_01.jpg" \
 		-F "images=@backend/static/turtle.jpg"
 
-backend-create-all: backend-create-offer backend-create-messages backend-create-image-offer
+backend-create-rental-application:
+	curl -X POST http://localhost:5000/api/rentalApplications \
+		-u renter:renter \
+		-H 'Content-Type: application/json' \
+		-d '{ \
+				"applicantId": 2, \
+				"offerId": 1 \
+			}'
+
+backend-approve-rental-application:
+	curl -X PUT http://localhost:5000/api/rentalApplications/1/approve \
+		-u poster:poster
+
+backend-create-and-approve-rental-application: backend-create-rental-application backend-approve-rental-application
+
+	
+backend-create-all: backend-create-offer backend-create-messages backend-create-image-offer backend-create-and-approve-rental-application
 
 # Docker Compose targets
 compose-up:
