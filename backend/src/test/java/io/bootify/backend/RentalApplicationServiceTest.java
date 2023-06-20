@@ -8,18 +8,23 @@ import io.bootify.backend.repos.UserRepository;
 import io.bootify.backend.repos.OfferRepository;
 import io.bootify.backend.service.RentalApplicationService;
 import io.bootify.backend.model.RentalApplicationDTO;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.mockito.BDDMockito.given;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
@@ -53,11 +58,23 @@ class RentalApplicationServiceTest {
 
         Offer offer = new Offer();
         offer.setId(1L);
-        
+
+        // Mocking SecurityContextHolder
+        UserDetails userDetails = mock(UserDetails.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        SecurityContextHolder.setContext(securityContext);
+
         // We use lenient here because we want to set a default behavior that may not be used in all the tests
+         lenient().when(userDetails.getUsername()).thenReturn("renter");
+        lenient().when(authentication.getPrincipal()).thenReturn(userDetails);
+        lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
         lenient().when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
         lenient().when(offerRepository.findById(any(Long.class))).thenReturn(Optional.of(offer));
-        
+        lenient().when(userRepository.findByUsername(any(String.class))).thenReturn(user);
+
+
         // Create a dummy RentalApplication
         rentalApplication = new RentalApplication();
         rentalApplication.setId(1L);
@@ -67,7 +84,6 @@ class RentalApplicationServiceTest {
 
         // Create a dummy RentalApplicationDTO
         rentalApplicationDTO = new RentalApplicationDTO();
-        rentalApplicationDTO.setApplicantId(1L);
         rentalApplicationDTO.setOfferId(1L);
         rentalApplicationDTO.setApproved(true);
     }
@@ -84,7 +100,6 @@ class RentalApplicationServiceTest {
         verify(rentalApplicationRepository).save(rentalApplicationArgumentCaptor.capture());
         RentalApplication capturedRentalApplication = rentalApplicationArgumentCaptor.getValue();
 
-        assertThat(capturedRentalApplication.getApplicant().getId()).isEqualTo(rentalApplicationDTO.getApplicantId());
         assertThat(capturedRentalApplication.getOffer().getId()).isEqualTo(rentalApplicationDTO.getOfferId());
         assertThat(capturedRentalApplication.isApproved()).isEqualTo(rentalApplicationDTO.isApproved());
 
@@ -106,7 +121,6 @@ class RentalApplicationServiceTest {
         RentalApplication capturedRentalApplication = rentalApplicationArgumentCaptor.getValue();
 
         assertThat(capturedRentalApplication.getId()).isEqualTo(1L);
-        assertThat(capturedRentalApplication.getApplicant().getId()).isEqualTo(rentalApplicationDTO.getApplicantId());
         assertThat(capturedRentalApplication.getOffer().getId()).isEqualTo(rentalApplicationDTO.getOfferId());
         assertThat(capturedRentalApplication.isApproved()).isEqualTo(rentalApplicationDTO.isApproved());
     }

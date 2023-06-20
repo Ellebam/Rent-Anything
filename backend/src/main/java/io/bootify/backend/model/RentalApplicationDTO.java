@@ -6,8 +6,6 @@ public class RentalApplicationDTO {
 
     private Long id;
 
-    @NotNull
-    private Long applicantId;
 
     @NotNull
     private Long offerId;
@@ -23,13 +21,6 @@ public class RentalApplicationDTO {
         this.id = id;
     }
 
-    public Long getApplicantId() {
-        return applicantId;
-    }
-
-    public void setApplicantId(final Long applicantId) {
-        this.applicantId = applicantId;
-    }
 
     public Long getOfferId() {
         return offerId;

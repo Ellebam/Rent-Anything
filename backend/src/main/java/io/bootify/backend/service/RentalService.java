@@ -39,7 +39,7 @@ public class RentalService {
                 .map((rental) -> mapToDTO(rental, new RentalDTO()))
                 .toList();
     }
-    
+
     public Long getUserIdByOfferId(final Long offerId) {
         final Offer offer = offerRepository.findById(offerId)
                 .orElseThrow(NotFoundException::new);

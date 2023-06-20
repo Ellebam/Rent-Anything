@@ -83,13 +83,25 @@ backend-create-rental-application:
 		-u renter:renter \
 		-H 'Content-Type: application/json' \
 		-d '{ \
-				"applicantId": 2, \
-				"offerId": 1 \
+				"offerId": 2 \
 			}'
 
 backend-approve-rental-application:
 	curl -X PUT http://localhost:5000/api/rentalApplications/1/approve \
 		-u poster:poster
+
+backend-create-rental:
+	curl -X POST http://localhost:5000/api/rentals \
+		-u poster:poster \
+		-H "Content-Type: application/json" \
+		-d '{ \
+			"renterId": 2, \
+			"offerId": 1, \
+			"startDate": "2023-06-06T13:00:00+00:00", \
+			"endDate": "2023-06-13T13:00:00+00:00", \
+			"isFinished": false \
+		}'
+
 
 backend-create-and-approve-rental-application: backend-create-rental-application backend-approve-rental-application
 

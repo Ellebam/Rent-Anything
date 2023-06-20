@@ -10,6 +10,8 @@ import io.bootify.backend.repos.UserRepository;
 import io.bootify.backend.util.NotFoundException;
 import java.util.List;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
@@ -46,9 +48,23 @@ public class RentalApplicationService {
         return rentalApplication.getOffer().getUser().getId();
     }
 
+    public Long getApplicantId(final Long id) {
+        final RentalApplication rentalApplication = rentalApplicationRepository.findById(id)
+                .orElseThrow(NotFoundException::new);
+        return rentalApplication.getApplicant().getId();
+    }
+
 
     public Long create(final RentalApplicationDTO rentalApplicationDTO) {
         final RentalApplication rentalApplication = new RentalApplication();
+
+        final Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final UserDetails userDetails = (UserDetails) principal;
+        final User user = userRepository.findByUsername(userDetails.getUsername());
+        if (user == null) {
+            throw new NotFoundException("User not found");
+            }
+        rentalApplication.setApplicant(user); // Set the applicant directly in RentalApplication
         mapToEntity(rentalApplicationDTO, rentalApplication);
         return rentalApplicationRepository.save(rentalApplication).getId();
     }
@@ -72,26 +88,20 @@ public class RentalApplicationService {
         rentalApplicationRepository.deleteById(id);
     }
     private RentalApplicationDTO mapToDTO(final RentalApplication rentalApplication,
-            final RentalApplicationDTO rentalApplicationDTO) {
-        rentalApplicationDTO.setId(rentalApplication.getId());
-        rentalApplicationDTO.setApplicantId(rentalApplication.getApplicant().getId());
-        rentalApplicationDTO.setOfferId(rentalApplication.getOffer().getId());
-        rentalApplicationDTO.setApproved(rentalApplication.isApproved());
-        return rentalApplicationDTO;
+        final RentalApplicationDTO rentalApplicationDTO) {
+            rentalApplicationDTO.setId(rentalApplication.getId());
+            rentalApplicationDTO.setOfferId(rentalApplication.getOffer().getId());
+            rentalApplicationDTO.setApproved(rentalApplication.isApproved());
+            return rentalApplicationDTO;
     }
 
+
     private RentalApplication mapToEntity(final RentalApplicationDTO rentalApplicationDTO,
-            final RentalApplication rentalApplication) {
-        rentalApplication.setApproved(rentalApplicationDTO.isApproved());
-        
-        final User user = userRepository.findById(rentalApplicationDTO.getApplicantId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
-        rentalApplication.setApplicant(user);
-        
-        final Offer offer = offerRepository.findById(rentalApplicationDTO.getOfferId())
-                .orElseThrow(() -> new NotFoundException("Offer not found"));
-        rentalApplication.setOffer(offer);
-        
-        return rentalApplication;
+        final RentalApplication rentalApplication) {
+            rentalApplication.setApproved(rentalApplicationDTO.isApproved());
+            final Offer offer = offerRepository.findById(rentalApplicationDTO.getOfferId())
+                    .orElseThrow(() -> new NotFoundException("Offer not found"));
+            rentalApplication.setOffer(offer);
+            return rentalApplication;
     }
 }
