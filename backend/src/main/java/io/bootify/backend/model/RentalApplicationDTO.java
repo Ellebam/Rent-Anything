@@ -13,6 +13,8 @@ public class RentalApplicationDTO {
     @NotNull
     private Boolean isApproved = false;
 
+    private Long applicantId;
+
     public Long getId() {
         return id;
     }
@@ -37,5 +39,12 @@ public class RentalApplicationDTO {
     public void setApproved(final Boolean isApproved) {
         this.isApproved = isApproved;
     }
+    
+    public Long getApplicantId() {
+        return applicantId;
+    }
 
+    public void setApplicantId(final Long applicantId) {
+        this.applicantId = applicantId;
+    }
 }

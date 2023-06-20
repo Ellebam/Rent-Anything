@@ -92,6 +92,7 @@ public class RentalApplicationService {
             rentalApplicationDTO.setId(rentalApplication.getId());
             rentalApplicationDTO.setOfferId(rentalApplication.getOffer().getId());
             rentalApplicationDTO.setApproved(rentalApplication.isApproved());
+            rentalApplicationDTO.setApplicantId(rentalApplication.getApplicant().getId());
             return rentalApplicationDTO;
     }
 
