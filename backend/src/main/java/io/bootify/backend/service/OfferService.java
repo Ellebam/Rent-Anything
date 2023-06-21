@@ -1,9 +1,11 @@
 package io.bootify.backend.service;
 
+import io.bootify.backend.domain.Message;
 import io.bootify.backend.domain.Offer;
 import io.bootify.backend.domain.OfferImage;
 import io.bootify.backend.domain.User;
 import io.bootify.backend.model.OfferDTO;
+import io.bootify.backend.repos.MessageRepository;
 import io.bootify.backend.repos.OfferRepository;
 import io.bootify.backend.repos.UserRepository;
 import io.bootify.backend.util.NotFoundException;
@@ -13,9 +15,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Service
 public class OfferService {
@@ -23,13 +30,17 @@ public class OfferService {
     private final OfferRepository offerRepository;
     private final UserRepository userRepository;
     private final OfferImageService offerImageService;
+    private final MessageRepository messageRepository;
 
     public OfferService(final OfferRepository offerRepository,
-            final UserRepository userRepository, final OfferImageService offerImageService) {
+            final UserRepository userRepository, final OfferImageService offerImageService, final MessageRepository messageRepository) {
         this.offerRepository = offerRepository;
         this.userRepository = userRepository;
         this.offerImageService = offerImageService;
+        this.messageRepository = messageRepository;
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(OfferService.class);
 
     @Transactional
     public List<OfferDTO> findAll() {
@@ -83,8 +94,37 @@ public class OfferService {
     }
 
     public void delete(final Long id) {
-        offerRepository.deleteById(id);
+        Offer offer = offerRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Offer not found"));
+
+        try {
+            // Retrieve all messages associated with this offer
+            List<Message> messages = messageRepository.findByOffer(offer);
+
+            // For each message, set the offer field to null and save
+            for (Message message : messages) {
+                    try {
+                message.setOffer(null);
+                messageRepository.save(message);
+            } catch (Exception e) {
+                logger.error("Exception occurred while uncoupling message with id: " + message.getId(), e);
+            }
+        }
+        } catch (Exception e) {
+            logger.error("Exception occurred while fetching messages", e);
+        }
+
+
+        // Delete associated images physically
+        String offerImagesDirectoryPath = "/app/images/" + id;
+        File directory = new File(offerImagesDirectoryPath);
+        deleteDirectory(directory);
+
+        // Delete Offer entity. This should also delete OfferImage, RentalApplication, Rental entities due to CascadeType.ALL
+        offerRepository.delete(offer);
     }
+
+
 
     private OfferDTO mapToDTO(final Offer offer, final OfferDTO offerDTO) {
         offerDTO.setId(offer.getId());
@@ -130,5 +170,16 @@ public class OfferService {
         offerRepository.save(offer);
 }
 
+    private void deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        if (!directoryToBeDeleted.delete()) {
+            logger.error("Could not delete directory " + directoryToBeDeleted);
+        }
+    }
 
 }

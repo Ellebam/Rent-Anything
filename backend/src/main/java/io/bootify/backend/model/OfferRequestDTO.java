@@ -7,6 +7,7 @@ public class OfferRequestDTO {
 
     private OfferDTO offerDTO;
     private List<MultipartFile> images;
+    private List<Long> imageIdsToDelete;
 
     public OfferDTO getOfferDTO() {
         return offerDTO;
@@ -22,5 +23,13 @@ public class OfferRequestDTO {
 
     public void setImages(List<MultipartFile> images) {
         this.images = images;
+    }
+
+    public List<Long> getImageIdsToDelete() {
+        return imageIdsToDelete;
+    }
+
+    public void setImageIdsToDelete(List<Long> imageIdsToDelete) {
+        this.imageIdsToDelete = imageIdsToDelete;
     }
 }

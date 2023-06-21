@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,30 +45,80 @@ public class OfferImageService {
             directory.mkdirs();
         }
 
-        // Iterate over the images provided in the request.
-        for (int i = 0; i < images.size(); i++) {
-            MultipartFile image = images.get(i);
-            String originalFilename = image.getOriginalFilename();
-            
-            // Security check: make sure the filename doesn't contain any harmful characters.
-            if (originalFilename != null && originalFilename.matches("[a-zA-Z0-9_.-]*")) {
-                Path path = Paths.get(offerImagesDirectoryPath + "/" + originalFilename);
+        // If images list is not empty
+        if (images != null && !images.isEmpty()) {
+            // Iterate over the images provided in the request.
+            for (int i = 0; i < images.size(); i++) {
+                MultipartFile image = images.get(i);
+                String originalFilename = image.getOriginalFilename();
                 
-                // Copy the image file to the directory.
-                Files.copy(image.getInputStream(), path);
-                
-                // Create an OfferImage entity for the image, set its properties, and save it to the repository.
-                OfferImage offerImage = new OfferImage(path.toString(), offer);
-                offerImage.setImageOrder(i+1);
-                offerImageRepository.save(offerImage);
-            } else {
-                throw new IllegalArgumentException("Invalid filename");
+                // Security check: make sure the filename doesn't contain any harmful characters.
+                if (originalFilename != null && originalFilename.matches("[a-zA-Z0-9_.-]*")) {
+                    Path path = Paths.get(offerImagesDirectoryPath + "/" + originalFilename);
+                    
+                    // Copy the image file to the directory.
+                    Files.copy(image.getInputStream(), path);
+                    
+                    // Create an OfferImage entity for the image, set its properties, and save it to the repository.
+                    OfferImage offerImage = new OfferImage(path.toString(), offer);
+                    offerImage.setImageOrder(i+1);
+                    offerImageRepository.save(offerImage);
+                } else {
+                    throw new IllegalArgumentException("Invalid filename");
+                }
+            }
+        }
+    }
+    
+    
+    @Transactional
+    public void deleteImages(Long offerId, List<Long> imageIds) {
+        // Check if imageIds list is not empty
+        if (imageIds != null && !imageIds.isEmpty()) {
+            for(Long imageId : imageIds) {
+                OfferImage image = offerImageRepository.findById(imageId)
+                    .orElseThrow(() -> new IllegalArgumentException("Image not found"));
+                if(!image.getOffer().getId().equals(offerId)) {
+                    throw new IllegalArgumentException("Image does not belong to this offer");
+                }
+                // Physically delete the image
+                try {
+                    Files.delete(Paths.get(image.getImagePath()));
+                } catch (IOException e) {
+                    // Log and handle the error as you prefer
+                    System.err.println("Error deleting image file: " + image.getImagePath());
+                }
+                // Delete the image entity
+                offerImageRepository.delete(image);
             }
         }
     }
 
-    
-    
+    @Transactional
+    public void cleanupImages(Long offerId, List<Long> imageIdsToKeep) {
+        // Get the offer for the given offerId. If the offer doesn't exist, throw an exception.
+        Offer offer = offerRepository.findById(offerId)
+            .orElseThrow(() -> new IllegalArgumentException("Offer not found"));
+
+        // Get all the images for the given offerId
+        List<OfferImage> offerImages = offer.getOfferImages();
+
+        // Create a list to hold the IDs of images to delete
+        List<Long> imageIdsToDelete = new ArrayList<>();
+
+        // Iterate over the offer's images
+        for (OfferImage image : offerImages) {
+            // If the image is not in the provided list, add its ID to the deletion list
+            if (!imageIdsToKeep.contains(image.getId())) {
+                imageIdsToDelete.add(image.getId());
+            }
+        }
+
+        // Delete the images not in the provided list
+        deleteImages(offerId, imageIdsToDelete);
+    }
+
+
     
     @Transactional
     public void updateImageOrder(Long offerId, List<Long> imageIds) {

@@ -5,7 +5,9 @@ import io.bootify.backend.domain.OfferImage;
 import io.bootify.backend.domain.User;
 import io.bootify.backend.repos.OfferRepository;
 import io.bootify.backend.repos.UserRepository;
+import io.bootify.backend.repos.MessageRepository;
 import io.bootify.backend.repos.OfferImageRepository;
+import io.bootify.backend.service.OfferImageService;
 import io.bootify.backend.service.OfferService;
 import io.bootify.backend.model.OfferDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,14 +39,19 @@ class OfferServiceTest {
     
     @Mock
     private OfferImageRepository offerImageRepository;
-    
+
+    @Mock
+    private MessageRepository messageRepository;
+
+    @Mock
+    private OfferImageService offerImageService;  
+
     @Mock
     private UserRepository userRepository;
 
     // Inject the service under test
     @InjectMocks
     private OfferService offerService;
-
     private Offer offer;
     private OfferDTO offerDTO;
 
@@ -123,13 +132,22 @@ class OfferServiceTest {
     // Test that Offer is correctly deleted
     @Test
     void shouldDeleteOffer() {
-   
-        // No setup needed, test the service method
+      // Set up mock responses and test the service method
+        given(offerRepository.findById(any(Long.class))).willReturn(Optional.of(offer));
+        lenient().when(messageRepository.findByOffer(any(Offer.class))).thenReturn(new ArrayList<>());
+
+
+        // Define the behaviour for messageRepository.findByOffer(offer)
+        given(messageRepository.findByOffer(any(Offer.class))).willReturn(new ArrayList<>()); 
+        //  test the service method
         offerService.delete(1L);
 
-        // Verify that the repository's deleteById method was called with the right argument
-        verify(offerRepository).deleteById(1L);
+        // Verify that the repository's delete method was called with the right argument
+        verify(offerRepository).delete(any(Offer.class));
+
+
     }
+
     // Test that Offer is correctly found by Id
     @Test
     void shouldFindOfferById() {

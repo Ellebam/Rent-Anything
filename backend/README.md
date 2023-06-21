@@ -29,3 +29,66 @@ java -Dspring.profiles.active=production -jar ./target/backend-0.0.1-SNAPSHOT.ja
 * [Maven docs](https://maven.apache.org/guides/index.html)  
 * [Spring Boot reference](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)  
 * [Spring Data JPA reference](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/)  
+
+
+
+Ok that worked thank you. Now I want to test the new functionalities regarding the new Endpoints. First I want to try to update the images on an offer. I have created an offer with images that looks like this in the database:
+
+	{
+		"id": 2,
+		"title": "Sample multiple image offer",
+		"description": "This is a sample offer with images.",
+		"location": null,
+		"price": 100.00,
+		"quantity": null,
+		"imageUrls": [
+			"/app/images/2/cirquit_board_compressed_01.jpg",
+			"/app/images/2/turtle.jpg"
+		],
+		"userId": 2,
+		"deactivated": false
+	}
+
+I used the following curl request in my Makefile for that:
+
+
+.PHONY: backend-create-image-offer
+backend-create-image-offer:
+	curl -X POST http://localhost:5000/api/offers \
+		-u poster:poster \
+		-F "offerDTO.userId=2" \
+		-F "offerDTO.title=Sample multiple image offer" \
+		-F "offerDTO.description=This is a sample offer with images." \
+		-F "offerDTO.quantity=1" \
+		-F "offerDTO.price=100.00" \
+		-F "images=@backend/static/cirquit_board_compressed_01.jpg" \
+		-F "images=@backend/static/turtle.jpg"
+
+I want to make use of this endpoint that we built:
+
+    @PatchMapping("/{id}/images")
+    @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> addOrDeleteImages(@PathVariable(name = "id") final Long id, 
+                                                @ModelAttribute OfferRequestDTO offerRequestDTO) {
+        List<MultipartFile> imagesToAdd = offerRequestDTO.getImages();
+        List<Long> imageIdsToDelete = offerRequestDTO.getImageIdsToDelete();
+
+        try {
+            if (imagesToAdd != null && !imagesToAdd.isEmpty()) {
+                offerImageService.saveImages(id, imagesToAdd);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error while saving images", e);
+        }
+
+        if (imageIdsToDelete != null && !imageIdsToDelete.isEmpty()) {
+            offerImageService.deleteImages(id, imageIdsToDelete);
+        }
+
+        offerImageService.cleanupImages(id, offerRequestDTO.getImageIdsToDelete());
+
+        return ResponseEntity.ok().build();
+    }
+
+
+help me write a nice curl request for my makefile to 
