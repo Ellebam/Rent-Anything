@@ -5,6 +5,7 @@ import io.bootify.backend.domain.Offer;
 import io.bootify.backend.domain.OfferImage;
 import io.bootify.backend.domain.User;
 import io.bootify.backend.model.OfferDTO;
+import io.bootify.backend.model.OfferImageDTO;
 import io.bootify.backend.repos.MessageRepository;
 import io.bootify.backend.repos.OfferRepository;
 import io.bootify.backend.repos.UserRepository;
@@ -180,6 +181,24 @@ public class OfferService {
         if (!directoryToBeDeleted.delete()) {
             logger.error("Could not delete directory " + directoryToBeDeleted);
         }
+    }
+
+    public List<OfferImageDTO> getOfferImages(Long offerId) {
+    Offer offer = offerRepository.findById(offerId)
+            .orElseThrow(() -> new NotFoundException("Offer not found"));
+
+    return offer.getOfferImages().stream()
+            .map(this::mapOfferImageToDTO)
+            .collect(Collectors.toList());
+    }
+
+    private OfferImageDTO mapOfferImageToDTO(OfferImage offerImage) {
+        OfferImageDTO offerImageDTO = new OfferImageDTO();
+        offerImageDTO.setId(offerImage.getId());
+        offerImageDTO.setImagePath(offerImage.getImagePath());
+        offerImageDTO.setImageOrder(offerImage.getImageOrder());
+        offerImageDTO.setOfferId(offerImage.getOffer().getId());
+        return offerImageDTO;
     }
 
 }

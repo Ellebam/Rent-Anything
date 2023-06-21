@@ -1,6 +1,7 @@
 package io.bootify.backend.rest;
 
 import io.bootify.backend.model.OfferDTO;
+import io.bootify.backend.model.OfferImageDTO;
 import io.bootify.backend.model.OfferRequestDTO;
 import io.bootify.backend.service.OfferService;
 import io.bootify.backend.service.OfferImageService;
@@ -80,7 +81,14 @@ public class OfferResource {
         offerService.update(id, offerDTO);
         return ResponseEntity.ok().build();
     }
+
     
+    @GetMapping("/{id}/images")
+    @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<OfferImageDTO>> getOfferImages(@PathVariable Long id) {
+        List<OfferImageDTO> offerImageDTOS = offerService.getOfferImages(id);
+        return new ResponseEntity<>(offerImageDTOS, HttpStatus.OK);
+    }
     @PatchMapping("/{id}/images")
     @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> addOrDeleteImages(@PathVariable(name = "id") final Long id, 
