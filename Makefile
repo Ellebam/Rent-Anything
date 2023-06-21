@@ -104,7 +104,7 @@ backend-create-image-offer:
 		-F "offerDTO.quantity=1" \
 		-F "offerDTO.price=100.00" \
 		-F "images=@backend/static/cirquit_board_compressed_01.jpg" \
-		-F "images=@backend/static/turtle.jpg"
+		-F "images=@backend/static/turtle_01.jpg"
 
 .PHONY: backend-create-rental-application
 backend-create-rental-application:
@@ -141,6 +141,16 @@ backend-create-rental:
 backend-delete-offer:
 	curl -X DELETE http://localhost:5000/api/offers/2 \
 		-u admin:admin
+
+.PHONY: backend-update-images
+backend-update-images:
+	curl -X PATCH http://localhost:5000/api/offers/3/images \
+		-u poster:poster \
+		-F "imageIdsToDelete=2" \
+		-F "images=@backend/static/turtle_01.jpg" \
+		-F "images=@backend/static/turtle_02.jpg" \
+		-F "images=@backend/static/cirquit_board_compressed_02.jpg"
+
 
 .PHONY: backend-create-all
 backend-create-all: backend-create-offer \

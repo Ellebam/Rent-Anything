@@ -89,6 +89,7 @@ public class OfferResource {
         List<OfferImageDTO> offerImageDTOS = offerService.getOfferImages(id);
         return new ResponseEntity<>(offerImageDTOS, HttpStatus.OK);
     }
+
     @PatchMapping("/{id}/images")
     @PreAuthorize("@offerService.get(#id).getUserId() == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> addOrDeleteImages(@PathVariable(name = "id") final Long id, 
@@ -96,12 +97,8 @@ public class OfferResource {
         List<MultipartFile> imagesToAdd = offerRequestDTO.getImages();
         List<Long> imageIdsToDelete = offerRequestDTO.getImageIdsToDelete();
 
-        try {
-            if (imagesToAdd != null && !imagesToAdd.isEmpty()) {
-                offerImageService.saveImages(id, imagesToAdd);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error while saving images", e);
+        if (imagesToAdd != null && !imagesToAdd.isEmpty()) {
+            offerImageService.saveImages(id, imagesToAdd);
         }
 
         if (imageIdsToDelete != null && !imageIdsToDelete.isEmpty()) {

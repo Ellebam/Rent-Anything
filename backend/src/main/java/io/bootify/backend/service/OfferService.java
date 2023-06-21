@@ -75,11 +75,7 @@ public class OfferService {
     
         // Check if images list is not empty
         if (images != null && !images.isEmpty()) { 
-            try {
-                offerImageService.saveImages(id, images);
-            } catch (IOException e) {
-                throw new RuntimeException("Error while saving images", e);
-            }
+            offerImageService.saveImages(id, images);
         }
         return id;
     }
