@@ -67,7 +67,7 @@ class RentalApplicationServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         // We use lenient here because we want to set a default behavior that may not be used in all the tests
-         lenient().when(userDetails.getUsername()).thenReturn("renter");
+        lenient().when(userDetails.getUsername()).thenReturn("renter");
         lenient().when(authentication.getPrincipal()).thenReturn(userDetails);
         lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
         lenient().when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));

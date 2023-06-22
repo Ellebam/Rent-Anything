@@ -4,8 +4,11 @@ import io.bootify.backend.domain.Offer;
 import io.bootify.backend.domain.OfferImage;
 import io.bootify.backend.repos.OfferImageRepository;
 import io.bootify.backend.repos.OfferRepository;
+import io.bootify.backend.util.LogMarkers;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,9 @@ import java.util.List;
 @Service
 public class OfferImageService {
 
+    // Logmarker for application logs
+   Marker backendLogMarker = LogMarkers.BACKEND;
+
     private final OfferImageRepository offerImageRepository;
     private final OfferRepository offerRepository;
 
@@ -36,11 +42,11 @@ public class OfferImageService {
 
     @Transactional
     public void saveImages(Long offerId, List<MultipartFile> images) {
-        log.info("Attempting to save images for offer id: {}", offerId);
+        log.info(backendLogMarker, "Attempting to save images for offer id: {}", offerId);
         // Get the offer for the given offerId. If the offer doesn't exist, throw an exception.
         Offer offer = offerRepository.findById(offerId)
             .orElseThrow(() -> {
-                log.error("Offer not found for id: {}", offerId);
+                log.error(backendLogMarker, "Offer not found for id: {}", offerId);
                 return new IllegalArgumentException("Offer not found");
             });
 
@@ -50,7 +56,7 @@ public class OfferImageService {
 
         // If the directory doesn't exist, create it.
         if (!directory.exists()) {
-            log.info("Creating directory for images: {}", offerImagesDirectoryPath);
+            log.info(backendLogMarker, "Creating directory for images: {}", offerImagesDirectoryPath);
             directory.mkdirs();
         }
 
@@ -67,10 +73,10 @@ public class OfferImageService {
 
                     // Copy the image file to the directory.
                     try {
-                        log.info("Copying image {} to directory", originalFilename);
+                        log.info(backendLogMarker, "Copying image {} to directory", originalFilename);
                         Files.copy(image.getInputStream(), path);
                     } catch (IOException e) {
-                        log.error("Error occurred while copying image to directory: {}", e.getMessage());
+                        log.error(backendLogMarker, "Error occurred while copying image to directory: {}", e.getMessage());
                     }
 
                     // Create an OfferImage entity for the image, set its properties, and save it to the repository.
@@ -78,7 +84,7 @@ public class OfferImageService {
                     offerImage.setImageOrder(i+1);
                     offerImageRepository.save(offerImage);
                 } else {
-                    log.error("Invalid filename detected: {}", originalFilename);
+                    log.error(backendLogMarker, "Invalid filename detected: {}", originalFilename);
                     throw new IllegalArgumentException("Invalid filename");
                 }
             }
@@ -87,26 +93,26 @@ public class OfferImageService {
 
     @Transactional
     public void deleteImages(Long offerId, List<Long> imageIds) {
-        log.info("Attempting to delete images for offer id: {}", offerId);
+        log.info(backendLogMarker, "Attempting to delete images for offer id: {}", offerId);
         // Check if imageIds list is not empty
         if (imageIds != null && !imageIds.isEmpty()) {
             for(Long imageId : imageIds) {
                 OfferImage image = offerImageRepository.findById(imageId)
                     .orElseThrow(() -> {
-                        log.error("Image not found for id: {}", imageId);
+                        log.error(backendLogMarker, "Image not found for id: {}", imageId);
                         return new IllegalArgumentException("Image not found");
                     });
                 if(!image.getOffer().getId().equals(offerId)) {
-                    log.error("Image {} does not belong to offer {}", imageId, offerId);
+                    log.error(backendLogMarker, "Image {} does not belong to offer {}", imageId, offerId);
                     throw new IllegalArgumentException("Image does not belong to this offer");
                 }
                 // Physically delete the image
                 try {
-                    log.info("Deleting image file: {}", image.getImagePath());
+                    log.info(backendLogMarker, "Deleting image file: {}", image.getImagePath());
                     Files.delete(Paths.get(image.getImagePath()));
                 } catch (IOException e) {
                     // Log the error and proceed to the next image
-                    log.error("Error deleting image file: {}", e.getMessage());
+                    log.error(backendLogMarker, "Error deleting image file: {}", e.getMessage());
                 }
                 // Delete the image entity
                 offerImageRepository.delete(image);
@@ -116,11 +122,11 @@ public class OfferImageService {
 
     @Transactional
     public void cleanupImages(Long offerId, List<Long> imageIdsToKeep) {
-        log.info("Cleaning up images for offer id: {}", offerId);
+        log.info(backendLogMarker, "Cleaning up images for offer id: {}", offerId);
         // Get the offer for the given offerId. If the offer doesn't exist, throw an exception.
         Offer offer = offerRepository.findById(offerId)
             .orElseThrow(() -> {
-                log.error("Offer not found for id: {}", offerId);
+                log.error(backendLogMarker, "Offer not found for id: {}", offerId);
                 return new IllegalArgumentException("Offer not found");
             });
 
@@ -145,10 +151,10 @@ public class OfferImageService {
 
     @Transactional
     public void updateImageOrder(Long offerId, List<Long> imageIds) {
-        log.info("Updating image order for offer id: {}", offerId);
+        log.info(backendLogMarker, "Updating image order for offer id: {}", offerId);
         // check if offer exists
         if (!offerRepository.existsById(offerId)) {
-            log.error("Offer not found for id: {}", offerId);
+            log.error(backendLogMarker, "Offer not found for id: {}", offerId);
             throw new IllegalArgumentException("Offer not found");
         }
 
@@ -157,7 +163,7 @@ public class OfferImageService {
             Long imageId = imageIds.get(i);
             OfferImage image = offerImageRepository.findById(imageId)
                 .orElseThrow(() -> {
-                    log.error("Image not found for id: {}", imageId);
+                    log.error(backendLogMarker, "Image not found for id: {}", imageId);
                     return new IllegalArgumentException("Image not found");
                 });
 

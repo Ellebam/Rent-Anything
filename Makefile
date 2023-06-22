@@ -6,6 +6,9 @@ IMAGE_TAG:=latest
 BACKEND_DIR:=backend
 BACKEND_PORT:=5000
 
+# Compose volumes prefix
+VOLUME_PREFIX:=rent-anything
+
 # ------------
 # Default target
 # ------------
@@ -139,14 +142,14 @@ backend-create-rental:
 
 .PHONY: backend-delete-offer
 backend-delete-offer:
-	curl -X DELETE http://localhost:5000/api/offers/2 \
+	curl -X DELETE http://localhost:5000/api/offers/1 \
 		-u admin:admin
 
 .PHONY: backend-update-images
 backend-update-images:
-	curl -X PATCH http://localhost:5000/api/offers/3/images \
+	curl -X PATCH http://localhost:5000/api/offers/1/images \
 		-u poster:poster \
-		-F "imageIdsToDelete=2" \
+		-F "imageIdsToDelete=1" \
 		-F "images=@backend/static/turtle_01.jpg" \
 		-F "images=@backend/static/turtle_02.jpg" \
 		-F "images=@backend/static/cirquit_board_compressed_02.jpg"
@@ -178,8 +181,21 @@ compose-down:
 compose-build:
 	docker-compose build
 
+# Delete volumes defined in the Docker Compose configuration
+.PHONY: compose-rm-volumes
+compose-rm-volumes:
+	docker volume ls | grep -E "$(VOLUME_PREFIX)_*" | awk '{print $$2}' | xargs docker volume rm 
+
+
 # Rebuild and restart the services defined in the Docker Compose configuration
 .PHONY: compose-rebuild
 compose-rebuild: compose-down \
                  compose-build \
                  compose-up
+
+# Rebuild and restart the services defined in the Docker Compose configuration 
+.PHONY: compose-full-rebuild
+compose-full-rebuild: compose-down \
+						compose-rm-volumes \
+						compose-build \
+						compose-up
