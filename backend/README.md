@@ -32,3 +32,9 @@ java -Dspring.profiles.active=production -jar ./target/backend-0.0.1-SNAPSHOT.ja
 
 
 
+
+## Current TO-DOs:
+
+- Test the deletion of single offer images (db as  well as backend storage server)
+- test the update of the offer images
+- test the update of the order of the offer images
