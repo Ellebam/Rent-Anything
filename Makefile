@@ -145,14 +145,23 @@ backend-delete-offer:
 	curl -X DELETE http://localhost:5000/api/offers/1 \
 		-u admin:admin
 
+
+.PHONY: backend-delete-image
+backend-delete-image:
+	curl -X PATCH http://localhost:5000/api/offers/1/images \
+		-u poster:poster \
+		-F "imageIdsToDelete=4"
+
 .PHONY: backend-update-images
 backend-update-images:
 	curl -X PATCH http://localhost:5000/api/offers/1/images \
 		-u poster:poster \
-		-F "imageIdsToDelete=1" \
+		-H 'Content-Type: multipart/form-data' \
+		-F "imageIdsToDelete=1,2" \
 		-F "images=@backend/static/turtle_01.jpg" \
 		-F "images=@backend/static/turtle_02.jpg" \
-		-F "images=@backend/static/cirquit_board_compressed_02.jpg"
+		-F "images=@backend/static/cirquit_board_compressed_02.jpg" \
+
 
 
 .PHONY: backend-create-all

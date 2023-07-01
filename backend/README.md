@@ -35,6 +35,6 @@ java -Dspring.profiles.active=production -jar ./target/backend-0.0.1-SNAPSHOT.ja
 
 ## Current TO-DOs:
 
-- Test the deletion of single offer images (db as  well as backend storage server)
-- test the update of the offer images
 - test the update of the order of the offer images
+    => Image order will not update when images are deleted
+    => Build in a check that will run after updating images so there are always a max of 4 images and an order exists.

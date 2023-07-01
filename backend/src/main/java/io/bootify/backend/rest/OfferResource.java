@@ -96,18 +96,19 @@ public class OfferResource {
         List<MultipartFile> imagesToAdd = offerRequestDTO.getImages();
         List<Long> imageIdsToDelete = offerRequestDTO.getImageIdsToDelete();
 
+        if (imageIdsToDelete != null && !imageIdsToDelete.isEmpty()) {
+            offerImageService.deleteImages(id, imageIdsToDelete);
+        }
+        
         if (imagesToAdd != null && !imagesToAdd.isEmpty()) {
             offerImageService.saveImages(id, imagesToAdd);
         }
 
-        if (imageIdsToDelete != null && !imageIdsToDelete.isEmpty()) {
-            offerImageService.deleteImages(id, imageIdsToDelete);
-        }
 
-        offerImageService.cleanupImages(id, offerRequestDTO.getImageIdsToDelete());
 
         return ResponseEntity.ok().build();
     }
+
 
 
 
